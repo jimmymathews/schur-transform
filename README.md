@@ -33,4 +33,4 @@ Characters:  [[1, -1, 1, 1, -1], [3, -1, -1, 0, 1], [2, 0, 2, -1, 0], [3, 1, -1,
 
 The `components` are the GL(k)- or Sn-isotypic components of the covariance tensor of `x` in the tensor space with `n` tensor factors and `k` dimensions for each factor. They are presented as multi-dimensional numpy arrays with `n` indices ranging across `k` values.
 
-*Recomputing precomputed values*. If you delete the character tables or projectors, they will be recomputed as needed. The calculation of character tables requires a local installation of Sage Math.
+**Recomputing precomputed values**. If you delete the character tables or projectors, they will be recomputed as needed. The calculation of character tables requires a local installation of Sage Math.
