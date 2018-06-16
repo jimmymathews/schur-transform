@@ -1,7 +1,7 @@
 Schur transform
 ===============
 
-Assume that data are stored in numpy array `x[i,j,a]`, where
+Assume that data are stored in multi-dimensional array `x[i,j,a]`, where
 
   - step index `i` ranges across `n` steps (e.g. time-steps)
   - sample index `j` ranges cross `N` samples (e.g. number of trajectories)
