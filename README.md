@@ -23,12 +23,16 @@ print("Characters:  "+str(characters))
 ```
 
 ```
-Calculating S4 characters.
-Saved to character_tables/s4.csv
-Saving projectors to projectors/dim2/steps4/*.npy
-Decomposition validated to precision 1e-10.
-Amplitudes:  [0.0, 0.0, 0.0001232275822899935, 0.0001926468896039451, 0.00015891651857671463]
-Characters:  [[1, -1, 1, 1, -1], [3, -1, -1, 0, 1], [2, 0, 2, -1, 0], [3, 1, -1, 0, -1], [1, 1, 1, 1, 1]]
+Firing up Sage.
+Calculating S6 characters.
+Saved to character_tables/s6.csv
+Calculating projectors.
+Projectors sum to identity operator.
+Saved projectors to projectors/dim2/steps6/*.npy
+
+Amplitudes:  [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.00017124337967512412, 0.0, 0.0003969951967875355, 0.0003523448534691481, 0.00015799079704690322]
+Characters:  [[1, -1, 1, -1, 1, -1, 1, -1, 1, 1, -1], [5, -3, 1, 1, 2, 0, -1, -1, -1, 0, 1], [9, -3, 1, -3, 0, 0, 0, 1, 1, -1, 0], [5, -1, 1, 3, -1, -1, 2, 1, -1, 0, 0], [10, -2, -2, 2, 1, 1, 1, 0, 0, 0, -1], [16, 0, 0, 0, -2, 0, -2, 0, 0, 1, 0], [5, 1, 1, -3, -1, 1, 2, -1, -1, 0, 0], [10, 2, -2, -2, 1, -1, 1, 0, 0, 0, 1], [9, 3, 1, 3, 0, 0, 0, -1, 1, -1, 0], [5, 3, 1, -1, 2, 0, -1, 1, -1, 0, -1], [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+Norm of total covariance tensor:  0.0005796873890922969
 ```
 
 The `components` are the GL(k)- or Sn-isotypic components of the covariance tensor of `x` in the tensor space with `n` tensor factors and `k` dimensions for each factor. Each one is presented as a multi-dimensional numpy array with `n` indices ranging across `k` values.

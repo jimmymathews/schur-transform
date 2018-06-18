@@ -257,6 +257,7 @@ class SchurTransform():
         with open("generate_character_tables_config.py", "w") as file:
             file.write("current_n="+str(self.n)+"\n")
         if(not os.path.isfile("character_tables/s"+str(self.n)+".csv")):
+            print("Firing up Sage.")
             call(["sage", "generate_character_tables.sage"])
         if(os.path.isfile("generate_character_tables.sage.py")):
             call(["rm", "generate_character_tables.sage.py"])
