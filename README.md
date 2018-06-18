@@ -1,13 +1,15 @@
 Schur transform
 ===============
 
-Assume that data are stored in multi-dimensional array `x[i,j,a]`, where
+This an an implmentation of the Schur transform. This transform calculates the other tensorial components of spatial covariances and joint moments in addition to the classical, symmetric ones.
+
+Let's say that your data are stored in multi-dimensional array `x[i,j,a]`, where
 
   - step index `i` ranges across `n` steps (e.g. time-steps)
   - sample index `j` ranges cross `N` samples (e.g. number of trajectories)
-  - spatial index `a` ranges across `k` dimensions (e.g. 1, 2 ,3)
+  - spatial index `a` ranges across `k` dimensions (e.g. 2, 3, or 4)
 
-Example usage
+The following shows example usage:
 
 ```
 import numpy as np
@@ -20,8 +22,6 @@ print("Amplitudes:  "+str(amplitudes))
 print("Characters:  "+str(characters))
 ```
 
-Output
-
 ```
 Calculating S4 characters.
 Saved to character_tables/s4.csv
@@ -31,6 +31,9 @@ Amplitudes:  [0.0, 0.0, 0.0001232275822899935, 0.0001926468896039451, 0.00015891
 Characters:  [[1, -1, 1, 1, -1], [3, -1, -1, 0, 1], [2, 0, 2, -1, 0], [3, 1, -1, 0, -1], [1, 1, 1, 1, 1]]
 ```
 
-The `components` are the GL(k)- or Sn-isotypic components of the covariance tensor of `x` in the tensor space with `n` tensor factors and `k` dimensions for each factor. They are presented as multi-dimensional numpy arrays with `n` indices ranging across `k` values.
+The `components` are the GL(k)- or Sn-isotypic components of the covariance tensor of `x` in the tensor space with `n` tensor factors and `k` dimensions for each factor. Each one is presented as a multi-dimensional numpy array with `n` indices ranging across `k` values.
 
 **Recomputing precomputed values**. If you delete the character tables or projectors, they will be recomputed as needed. The calculation of character tables requires a local installation of Sage Math.
+
+**Reference**.
+(put reference here: *A Schur Transform for Multivariate Series*)
