@@ -1,7 +1,7 @@
 Schur transform
 ===============
 
-This an an implmentation of the Schur transform. This transform calculates the other tensorial components of spatial covariances and joint moments in addition to the classical, symmetric ones.
+This is an implmentation of the Schur transform. This transform calculates the other tensorial components of spatial covariances and joint moments in addition to the classical, symmetric ones.
 
 Let's say that your data are stored in multi-dimensional array `x[i,j,a]`, where
 
