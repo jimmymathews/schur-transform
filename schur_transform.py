@@ -244,7 +244,7 @@ class SchurTransform():
         self.calculate_covariance_tensor()
         self.calculate_decomposition()
         self.validate_decomposition()
-        print("")
+        # print("")
 
     def summary(self):
         amplitudes = [np.linalg.norm(component.data) for component in self.decomposition]
