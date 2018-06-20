@@ -7,22 +7,29 @@
 import numpy as np
 from schur_transform import schur_transform
 
+
 x = np.array([ [[4,2],[4.01,2.1],[3.9,2.2]] , [[3.99,2.1],[3.7,2.1],[4.0,2.2]] , [[4.4,1.9],[4.3,1.8],[4.3,1.8]], [[4.6,2.0],[4.1,1.8],[4.3,1.7]],[[3.6,2.1],[4.5,2],[5,1]],[[3.0,2.2],[7,2.2],[5.6,1.2]]])
 [components, amplitudes, characters] = schur_transform(x)
 print("Amplitudes:  "+str(amplitudes))
 print("Characters:  "+str(characters))
-print("Norm of total covariance tensor:  "+str(np.linalg.norm(amplitudes)))
+#print("Norm of total covariance tensor:  "+str(np.linalg.norm(amplitudes)))
 
 
 
-
-
+### GUI demo
+### keys:
+###  p  place a point (on the left pane)
+###  r  start/stop rotating (on the right pane; currently not a permanent effect)
+###  c  clear the placed points (except 0)
+###  1  start/stop placing basis element 1 (on the right pane)
+###  2  start/stop placing basis element 2 (on the right pane)
+###
+### I couldn't quite figure out how to capture mouse events beyond basic motion, hence the key-driven action instead.
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui, QtCore
 from pyqtgraph.Point import Point
 from pyqtgraph import ScatterPlotItem
-
 
 class KeyPressWindow(pg.GraphicsWindow):
     sigKeyPress = QtCore.pyqtSignal(object)
@@ -33,9 +40,6 @@ class KeyPressWindow(pg.GraphicsWindow):
     def keyPressEvent(self, ev):
         self.scene().keyPressEvent(ev)
         self.sigKeyPress.emit(ev)
-
-# x = [val - 10 for val in range(20)]
-# y = [10 - val for val in range(20)]
 
 class Tracker:
     def __init__(self):
@@ -87,61 +91,33 @@ class Tracker:
 
 m = Tracker()
 
-#generate layout
 app = QtGui.QApplication([])
 # win = pg.GraphicsWindow()
 win = KeyPressWindow()
 win.sigKeyPress.connect(m.keyPressed)
 win.setWindowTitle('2-factor Schur transform')
-# label = pg.LabelItem(justify='left')
-# label = pg.TextItem()
 
 p1 = win.addPlot(row=0, col=1)
 p2 = win.addPlot(row=0, col=2)
-# p3 = win.addPlot(row=0, col=3)
-
-# win.addItem(label)
-# p2.addItem(label, anchor=(10,10))
-
-
-
 label = win.addLabel('...',row=1, col=1)
-
 
 p1.plot(m.x, m.y, symbolPen='w', pen=None)
 
+# This is probably doing nothing
 region = pg.LinearRegionItem()
 region.setZValue(10)
-# Add the LinearRegionItem to the ViewBox, but tell the ViewBox to exclude this 
-# item when doing auto-range calculations.
-# p2.addItem(region, ignoreBounds=True)
 
-#pg.dbg()
 p1.setAutoVisible(y=True)
-
-
-
-# p1.plot(data1, pen="r")
-# p1.plot(data2, pen="g")
-
 p2.plot(m.tx,m.ty, symbolPen='w', pen=None)
-
-# p3.plot(data2, pen='r')
 
 p1.setXRange(-10,10)
 p1.setYRange(-10,10)
 p2.setXRange(-10,10)
 p2.setYRange(-10,10)
-# p3.setXRange(-10,10)
-# p3.setYRange(-10,10)
-
-# p2.hideAxis('left')
-# p2.hideAxis('bottom')
 
 def update():
     region.setZValue(10)
     minX, maxX = region.getRegion()
-    # p1.setXRange(minX, maxX, padding=0)    
 
 region.sigRegionChanged.connect(update)
 
@@ -150,19 +126,6 @@ def updateRegion(window, viewRange):
     region.setRegion(rgn)
 
 p1.sigRangeChanged.connect(updateRegion)
-
-# region.setRegion([-20, 20])
-
-#cross hair
-# vLine = pg.InfiniteLine(angle=90, movable=False)
-# hLine = pg.InfiniteLine(angle=0, movable=False)
-# vP = pg.InfiniteLine(angle=90, movable=False)
-# hP = pg.InfiniteLine(angle=0, movable=False)
-
-# p1.addItem(vLine, ignoreBounds=True)
-# p1.addItem(hLine, ignoreBounds=True)
-# p2.addItem(vP, ignoreBounds=True)
-# p2.addItem(hP, ignoreBounds=True)
 
 basis1=ScatterPlotItem([0,m.basis1data[0]],[0,m.basis1data[1]], pen='r')
 basis2=ScatterPlotItem([0,m.basis2data[0]],[0,m.basis2data[1]], pen='r')
@@ -182,10 +145,6 @@ def mouseMoved(evt):
         mx = mousePoint.x()
         my = mousePoint.y()
         index = int(mousePoint.x())
-        # if index > 0:
-        # label.setText("<br><span style='font-size: 16pt; color: green'>M(S2V)= <br> [%0.1f,%0.1f] <br> [%0.1f,%0.1f] <br><br><span style='color: red'>M(L2V)= <br> %0.1f</span>" % (mousePoint.x(),mousePoint.x(),mousePoint.x(),mousePoint.x(),mousePoint.x()))
-        # vLine.setPos(mousePoint.x())
-        # hLine.setPos(mousePoint.y())
         m.leftPointX = mousePoint.x()
         m.leftPointY = mousePoint.y()
         if(m.needs_update or m.needs_clear):
@@ -207,10 +166,6 @@ def mouseMoved(evt):
 
         mousePoint = vb2.mapSceneToView(pos)
         index = int(mousePoint.x())
-        # if index > 0 and index < len(data1):
-        #     label.setText("<span style='font-size: 12pt'>x=%0.1f,   <span style='color: red'>y1=%0.1f</span>,   <span style='color: green'>y2=%0.1f</span>" % (mousePoint.x(), data1[index], data2[index]))
-        # vP.setPos(mousePoint.x())
-        # hP.setPos(mousePoint.y())
         mx = mousePoint.x()
         my = mousePoint.y()
         if(m.mode == 1):
@@ -246,14 +201,11 @@ def mouseMoved(evt):
             m.tx = pushed[0]
             m.ty = pushed[1]
 
-            # m.basis1data=[b1x,b1y]
-            # m.basis2data=[b2x,b2y]
-
         sym = m.components[1]
         ext = m.components[0]
         label.setText("<br><span style='font-size: 20pt; color: green'>M(symmetric)= <br> [%0.001f,%0.001f] <br> [%0.1f,%0.1f] <br><br><span style='color: red'>M(anti-symmetric)= <br> [%0.001f, %0.001f]<br>[%0.001f,%0.001f]</span>" % (sym[0,0],sym[0,1],sym[1,0],sym[1,1],ext[0,0],ext[0,1],ext[1,0],ext[1,1]))
 
-
+        # Probably this is refreshing too often
         p2.clear()
         p2.plot(tx,ty, symbolPen='w', pen=None)
         p2.addItem(basis1, ignoreBounds=True)
@@ -261,12 +213,12 @@ def mouseMoved(evt):
 
 
 proxy = pg.SignalProxy(p1.scene().sigMouseMoved, rateLimit=60, slot=mouseMoved)
-
 #p1.scene().sigMouseMoved.connect(mouseMoved)
-
 
 ## Start Qt event loop unless running in interactive mode or using pyside.
 if __name__ == '__main__':
     import sys
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
+
+

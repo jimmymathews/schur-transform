@@ -12,6 +12,10 @@ class tensor:
     A data structure for a tensor of type V⊗...⊗V.
     '''
     def __init__(self, n, k):
+        '''
+        n is the number of factors.
+        k is the dimension of the base vector space.
+        '''
         self.n = n
         self.k = k
         self.data = np.zeros([k for i in range(n)])
@@ -47,20 +51,23 @@ class tensor:
             self.data = self.data + other_tensor.data
 
     def scale_by(self, amount):
+        '''
+        Returns new tensor scaled entry by entry by amount.
+        '''
         t = tensor(self.n, self.k)
         t.data = self.data * amount
         return t
 
 class tensor_operator:
     '''
-    A data structure for an endomorphism of tensors, an element of End(V⊗...⊗V).
+    A data structure for an endomorphism of tensors, a linear transformation, an element of End(V⊗...⊗V).
     '''
     def __init__(self, n, k, identity = False, permutation_inverse = None):
         '''
         n is the number of tensor factors.
         k is the dimension for the base vector space.
         identity = True will make this tensor_operator into the identity operator.
-        permutation_inverse = p will make this tensor_operator into the operator of permutation of the n tensor factors. p should have the formatted as in [1, 2, 3].
+        permutation_inverse = p will make this tensor_operator into the operator of permutation of the n tensor factors. p should be formatted as in [1, 2, 3].
         '''
         self.n = n
         self.k = k
@@ -142,7 +149,7 @@ class SymmetricGroupUtilities:
 
     def partition_from_cycle_type(self, cycle_type, n):
         '''
-        Returns an ordered list of integers which partition the integer n, representing the cycle type specified by cycle_type. The format of cycle_type should be as in (1 2)(3 4). The parenthesis are mandatory, and the spacing is somewhat optional in that other characters may be used as spacers as long as they are non-digits. The cycle lengths are calculated as the number of contiguous digit groups between parentheses.
+        Returns an ordered list of integers which partition the integer n, representing the cycle type specified by the string cycle_type. The format of cycle_type should be as in (1 2)(3 4). The parenthesis are mandatory, and the spacing is somewhat optional in that other characters may be used as spacers as long as they are non-digits. The cycle lengths are calculated as the number of contiguous digit groups between parentheses.
         '''
         cycles = re.findall("\\(([\s\d]+)\\)", cycle_type)
         if(len(cycles)<1):
@@ -167,6 +174,7 @@ class SymmetricGroupUtilities:
     def partition_from_permutation(self, permutation):
         '''
         Returns an ordered list of integers which partition the integer n, representing the cycle type of the argument permutation. The format of permutation should be a list as in [1 ,2 ,3].
+        Also builds a cycle-notation string description of the permutation (not returned).
         '''
         n = len(permutation)
         masked = [0 for i in range(n)]
@@ -230,6 +238,10 @@ class SymmetricGroupUtilities:
 
 class SchurTransform():
     def __init__(self, x):
+        '''
+        x should be in the format of numpy ndarray x[i,j,a]. i is the series index, j is the sample index, and a is the spatial coordinate index.
+        For the future: Allow x to be a list of such ndarrays, for batch processing.
+        '''
         self.x = x
         [self.n, self.N, self.k] = x.shape
         self.precomputations()
@@ -244,7 +256,6 @@ class SchurTransform():
         self.calculate_covariance_tensor()
         self.calculate_decomposition()
         self.validate_decomposition()
-        # print("")
 
     def summary(self):
         amplitudes = [np.linalg.norm(component.data) for component in self.decomposition]
@@ -315,7 +326,7 @@ class SchurTransform():
 
         identity_scaled = tensor_operator(self.n, self.k, identity = True).scale_by(math.factorial(self.n))
         if(not (sum_of_projectors.data==identity_scaled.data).all() ):
-            print("Error: Projectors to not sum to identity.")
+            print("Error: Projectors do not sum to identity.")
         else:
             print("Projectors sum to identity operator.")
 
