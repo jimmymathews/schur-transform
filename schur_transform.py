@@ -237,7 +237,7 @@ class SymmetricGroupUtilities:
                 print("Error: Found "+ str(len(c))+" permutations of certain class, not "+str(sizes[i])+".")
         return permutations_by_class
 
-class SchurTransform():
+class DiscreteSchurTransform():
     def __init__(self, x):
         '''
         x should be in the format of numpy ndarray x[i,j,a]. i is the series index, j is the sample index, and a is the spatial coordinate index.
@@ -370,14 +370,14 @@ class SchurTransform():
         if(error > precision):
             print("Error: Components do not add up to given covariance tensor. (Difference norm "+str(error)+")")
 
-def schur_transform(x):
+def dst(x):
     '''
-    Calculates the Schur transform of x.
+    Calculates the (discrete) Schur transform of x.
     x is a multi-dimensional numpy array. Elements x[i,j,a], where
     i is the series index,
     j is the sample index, and
     a is the spatial dimension index.
     '''
-    st = SchurTransform(x)
-    return st.summary()
+    dst = DiscreteSchurTransform(x)
+    return dst.summary()
 

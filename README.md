@@ -1,7 +1,7 @@
 Schur transform
 ===============
 
-This is an implementation of the Schur transform, as described in *A Schur Transform for Spatial Stochastic Processes*. The transform calculates irreducible tensorial components of spatial covariances and joint moments.
+This is an implementation of the algorithm described in *A Schur Transform for Spatial Stochastic Processes*. The transform calculates irreducible tensorial components of spatial covariances and joint moments.
 
 Let's say that your data are stored in a multi-dimensional array `v[i,j,a]`, where
 
@@ -13,11 +13,11 @@ The following shows example usage:
 
 ```
 import numpy as np
-from schur_transform import schur_transform
+import schur_transform
 
 # This example has n=6, N=3, k=2
 v = np.array([ [[4,2],[4.01,2.1],[3.9,2.2]] , [[3.99,2.1],[3.7,2.1],[4.0,2.2]] , [[4.4,1.9],[4.3,1.8],[4.3,1.8]], [[4.6,2.0],[4.1,1.8],[4.3,1.7]],[[3.6,2.1],[4.5,2],[5,1]],[[3.0,2.2],[7,2.2],[5.6,1.2]]])
-[components, amplitudes, characters] = schur_transform(v)
+[components, amplitudes, characters] = schur_transform.dst(v)
 print("Amplitudes:  "+str(amplitudes))
 print("Characters:  "+str(characters))
 ```
