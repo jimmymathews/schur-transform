@@ -1,10 +1,9 @@
 Schur transform
 ===============
 
-This is an implementation of the Schur transform, as described in *A Schur Transform for Spatial Stochastic Processes*
-. The transform calculates irreducible tensorial components of spatial covariances and joint moments.
+This is an implementation of the Schur transform, as described in *A Schur Transform for Spatial Stochastic Processes*. The transform calculates irreducible tensorial components of spatial covariances and joint moments.
 
-Let's say that your data are stored in multi-dimensional array `v[i,j,a]`, where
+Let's say that your data are stored in a multi-dimensional array `v[i,j,a]`, where
 
   - step index `i` ranges across `n` steps (e.g. time-steps, or cases)
   - sample index `j` ranges cross `N` samples (e.g. number of trajectories or landmarks)
