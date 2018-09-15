@@ -206,6 +206,7 @@ class SymmetricGroupUtilities:
                     break
         cycle_lengths.append(cycle_length)
         descriptor = descriptor + ")"
+        # print(descriptor)
         return sorted(cycle_lengths)
 
     def partitions_compared(self, l1, l2):
@@ -300,7 +301,7 @@ class SchurTransform():
             projector = tensor_operator(self.n, self.k)
             for m, collated_permutation_operator in enumerate(collated_permutation_operators):
                 projector.add(collated_permutation_operator.scale_by(character[m]))
-            # These projectors are scaled by factorial(n). Neglecting to normalize them allows integral values and greater precision.
+            # These projectors are scaled by factorial(n). Neglecting to normalize them at this stage allows integral values and greater precision.
             projector = projector.scale_by(character[0])
 
             if(not os.path.exists("projectors/")):
@@ -352,6 +353,7 @@ class SchurTransform():
             file = "projectors/dim"+str(self.k)+"/steps"+str(self.n)+"/"+str(l)+".npy"
             projector = tensor_operator(self.n, self.k)
             pickled= np.load(file)
+            # print(" ".join([str(val) for val in pickled.flatten()]))
             projector.data = pickled
             component = projector.apply(self.covariance_tensor)
             self.decomposition.append(component.scale_by(1.0/math.factorial(self.n)))
