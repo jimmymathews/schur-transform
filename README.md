@@ -37,6 +37,3 @@ Characters:  [[1, -1, 1, -1, 1, -1, 1, -1, 1, 1, -1], [5, -3, 1, 1, 2, 0, -1, -1
 The `components` are the GL(k)- or Sn-isotypic components of the covariance tensor of `v` in the tensor space with `n` tensor factors and `k` dimensions for each factor. Each one is presented as a multi-dimensional numpy array with `n` indices ranging across `k` values.
 
 **Recomputing precomputed values**. If you delete the character tables or projectors, they will be recomputed as needed. The calculation of character tables requires a local installation of Sage Math.
-
-**Reference**.
-(*A Schur Transform for Spatial Stochastic Processes*)
