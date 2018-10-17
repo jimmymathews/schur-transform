@@ -67,7 +67,7 @@ class tensor_operator:
         n is the number of tensor factors.
         k is the dimension for the base vector space.
         identity = True will make this tensor_operator into the identity operator.
-        permutation_inverse = p will make this tensor_operator into the operator of permutation of the n tensor factors. p should be formatted as in [1, 2, 3].
+        permutation_inverse = p will make this tensor_operator into the operator of permutation of the n tensor factors. p should be formatted as in [2, 1, 3].
         '''
         self.n = n
         self.k = k
@@ -97,7 +97,7 @@ class tensor_operator:
 
     def apply(self, input_tensor):
         '''
-        Just application of this tensor_operator as a linear map to the input tensor.
+        Application of this tensor_operator as a linear map to the input tensor.
         '''
         if(input_tensor.n != self.n or input_tensor.k != self.k):
             print("Error: input_tensor type (n,k)=("+str(input_tensor.n)+","+str(input_tensor.k)+") is wrong.")
@@ -237,16 +237,46 @@ class SymmetricGroupUtilities:
                 print("Error: Found "+ str(len(c))+" permutations of certain class, not "+str(sizes[i])+".")
         return permutations_by_class
 
-class DiscreteSchurTransform():
-    def __init__(self, x):
+import itertools
+import copy
+
+class schur_transform():
+    def __init__(self):
+        self.loaded_n = -1
+        
+    def dst(self, x):
         '''
         x should be in the format of numpy ndarray x[i,j,a]. i is the series index, j is the sample index, and a is the spatial coordinate index.
         For the future: Allow x to be a list of such ndarrays, for batch processing.
         '''
-        self.x = x
+        self.x = copy.deepcopy(x)
         [self.n, self.N, self.k] = x.shape
         self.precomputations()
         self.main_computation()
+
+    def get_coordinate_labels(self):
+        return [str(elt) for elt in self.conjugacy_class_representatives]
+
+    def schur_content(self, x, number_of_factors = 3):
+        [case_number, point_sample_size, spatial_dimension] = x.shape
+        indices = [i for i in range(case_number)]
+        subsets = list(itertools.combinations(indices, number_of_factors))
+        content = []
+        for subset in subsets:
+            xp = x[subset,:,:]
+            self.dst(xp)
+            content.append(self.get_amplitudes())
+        return np.array(content)
+
+    def mean_schur_content(self, x, number_of_factors = 3):
+        sc = self.schur_content(x, number_of_factors = number_of_factors)
+        sct = sc.transpose()
+        return [np.mean(row) for row in sct]
+
+    def variance_schur_content(self, x, number_of_factors = 3):
+        sc = self.schur_content(x, number_of_factors = number_of_factors)
+        sct = sc.transpose()
+        return [np.var(row) for row in sct]
 
     def precomputations(self):
         self.consider_generate_and_load_character_table()
@@ -258,9 +288,11 @@ class DiscreteSchurTransform():
         self.calculate_decomposition()
         self.validate_decomposition()
 
+    def get_amplitudes(self):
+        return [np.linalg.norm(component.data) for component in self.decomposition]
+
     def summary(self):
-        amplitudes = [np.linalg.norm(component.data) for component in self.decomposition]
-        return [[component.data for component in self.decomposition], amplitudes, self.character_values]
+        return [[component.data for component in self.decomposition], self.get_amplitudes(), self.character_values]
 
     def consider_generate_and_load_character_table(self):
         '''
@@ -276,7 +308,13 @@ class DiscreteSchurTransform():
         call(["rm", "generate_character_tables_config.py"])
 
         self.sgu = SymmetricGroupUtilities()
+        if(self.loaded_n == self.n):
+            return
         [self.conjugacy_class_sizes, self.conjugacy_class_representatives, self.character_values] = self.sgu.load_character_table("character_tables/s"+str(self.n)+".csv")
+        self.loaded_n = self.n
+        print("")
+        print("Class representatives:")
+        print(str(self.conjugacy_class_representatives))
 
     def consider_generate_and_load_projectors(self):
         '''
@@ -365,19 +403,40 @@ class DiscreteSchurTransform():
         total = tensor(self.n, self.k)
         for component in self.decomposition:
             total.add(component)
-        error = np.linalg.norm(total.data - self.covariance_tensor.data)
-        precision = 0.0000000001
+        error = np.linalg.norm(total.data - self.covariance_tensor.data) / np.linalg.norm(self.covariance_tensor.data)
+        precision = 0.00001
         if(error > precision):
             print("Error: Components do not add up to given covariance tensor. (Difference norm "+str(error)+")")
 
-def dst(x):
-    '''
-    Calculates the (discrete) Schur transform of x.
-    x is a multi-dimensional numpy array. Elements x[i,j,a], where
-    i is the series index,
-    j is the sample index, and
-    a is the spatial dimension index.
-    '''
-    dst = DiscreteSchurTransform(x)
-    return dst.summary()
+# class SampleGroup:
+#     def __init__(self, x):
+#         '''
+#         x is a multi-dimensional numpy array. Elements x[i,j,a], where
+#         i is the series index,
+#         j is the sample index, and
+#         a is the spatial dimension index.
+#         '''
+#         self.x = x
+#         dims = x.shape
+#         self.case_number = dims[0]
+#         self.point_sample_number = dims[1]
+#         self.spatial_dimension = dims[2]
+
+#     def dst(self):
+#         '''
+#         Calculates the (discrete) Schur transform of the whole case set x.
+#         '''
+#         if(pow(self.spatial_dimension, self.case_number) > 10000):
+#             print("Error: tensors of type "+str(self.spatial_dimension)+" x ... x "+str(self.spatial_dimension)+" ("+str(self.case_number)+" times) are too large.")
+#             return
+#         dst = DiscreteSchurTransform(x)
+#         return dst.summary()
+
+
+
+
+
+
+
+
 
