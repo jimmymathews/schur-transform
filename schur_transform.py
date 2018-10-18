@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 
+import warnings
+warnings.filterwarnings("ignore", message="numpy.dtype size changed")
+warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
+
 import numpy as np
 from subprocess import call
 import math
@@ -259,10 +263,33 @@ class schur_transform():
 
     def schur_content(self, x, number_of_factors = 3):
         [case_number, point_sample_size, spatial_dimension] = x.shape
+        if(number_of_factors > case_number):
+            print("Error: Choose fewer than "+str(case_number)+" (the number of cases) for the number of factors for Schur content.")
+            return
         indices = [i for i in range(case_number)]
         subsets = list(itertools.combinations(indices, number_of_factors))
         content = []
         for subset in subsets:
+            xp = x[subset,:,:]
+            self.dst(xp)
+            content.append(self.get_amplitudes())
+        return np.array(content)
+
+    def sequential_schur_content(self, x, number_of_factors = 3):
+        '''
+        The same as the n-factor Schur content, except that only n consecutive subsets of the series/case set are considered (so the order of the cases in x matters).
+        '''
+        [case_number, point_sample_size, spatial_dimension] = x.shape
+        # indices = [i for i in range(case_number)]
+        # subsets = list(itertools.combinations(indices, number_of_factors))
+        # content = []
+        # for subset in subsets:
+        if(number_of_factors > case_number):
+            print("Error: Choose fewer than "+str(case_number)+" (the number of cases) for the number of factors for sequential Schur content.")
+            return
+        content = []
+        for i in range(1+ case_number - number_of_factors):
+            subset = [j for j in range(i,i+number_of_factors)]
             xp = x[subset,:,:]
             self.dst(xp)
             content.append(self.get_amplitudes())
@@ -312,9 +339,6 @@ class schur_transform():
             return
         [self.conjugacy_class_sizes, self.conjugacy_class_representatives, self.character_values] = self.sgu.load_character_table("character_tables/s"+str(self.n)+".csv")
         self.loaded_n = self.n
-        print("")
-        print("Class representatives:")
-        print(str(self.conjugacy_class_representatives))
 
     def consider_generate_and_load_projectors(self):
         '''

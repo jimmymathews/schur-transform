@@ -8,8 +8,9 @@ from schur_transform import schur_transform
 import matplotlib.pyplot as plot
 import seaborn as sns
 import pandas as pd
+sns.set(style="whitegrid")
 
-
+# Data available from www.dir-lab.com . I reformatted these files (removing tabs and spaces) as CSV (adding commas).
 def grab_from_4DCT(case):
     filenames=[
     "example_data/case"+case+"_4D-75_T00.txt",
@@ -19,75 +20,82 @@ def grab_from_4DCT(case):
     "example_data/case"+case+"_4D-75_T40.txt",
     "example_data/case"+case+"_4D-75_T50.txt"]
     X = []
-    for i,filename in enumerate(filenames):
-        X.append([])
-        with open(filename) as file:
-            reader = csv.reader(file)
-            for row in reader:
-                X[i].append([float(val) for val in row])
+
+    #Virtual case, not part of the actual case set.
+    #For testing purposes. Just uses Case 1's first time point (T00) for all times.
+    if(case == "0"):
+        for i in range(len(filenames)):
+            X.append([])
+            with open("example_data/case1_4D-75_T00.txt") as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    X[i].append([float(val) for val in row])
+    else:
+        #Otherwise, use the actual data
+        for i,filename in enumerate(filenames):
+            X.append([])
+            with open(filename) as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    X[i].append([float(val) for val in row])
     return np.array(X)
-x1 = grab_from_4DCT("1")
-x2 = grab_from_4DCT("2")
-x3 = grab_from_4DCT("3")
 
-def variance_scale(input):
-    temp = copy.deepcopy(input.transpose())
-    for i in range(len(temp)):
-        s = np.max(temp[i])-np.min(temp[i])
-        m = np.min(temp[i]) + s/2
-        for j in range(len(temp[i])):
-            temp[i,j] = (temp[i,j]-m)
-        if(s==0):
-            continue
-        for j in range(len(temp[i])):
-            temp[i,j] = temp[i,j]/s
-    return temp.transpose()
+def single_log_scale(val):
+    if(val!=0):
+        return np.log(val)
+    else:
+        return -float('Inf')
 
-def log_scale(input):
-    temp = copy.deepcopy(input.transpose())
-    for i in range(len(temp)):
-        for j in range(len(temp[i])):
-            if(temp[i,j]!=0):
-                temp[i,j] = np.log(temp[i,j])
-            else:
-                temp[i,j] = 'NaN'
-    return temp.transpose()
-
-
-number_of_factors = 4
 st = schur_transform()
+x1 = grab_from_4DCT("1")
+number_of_factors = 4
 
 sc1 = st.schur_content(x1, number_of_factors=number_of_factors)
-index = [i for i in range(len(sc1))]
-columns = st.get_coordinate_labels()
-df1 = pd.DataFrame(log_scale(sc1), index=index, columns=columns)
+modes = st.get_coordinate_labels()
+schurcontent = str(number_of_factors)+"-factor Schur content"
+d = {schurcontent: [], "Mode": [],"Case": []}
+for i in range(5):
+    xi = grab_from_4DCT(str(i+1))
+    sc = st.schur_content(xi, number_of_factors=number_of_factors)
+    for j in range(len(sc)):
+        for k in range(len(sc[j])):
+            d[schurcontent].append(single_log_scale(sc[j,k]))
+            d["Mode"].append(modes[k])
+            d["Case"].append(str(i+1))
+    print("Finished case "+str(i+1)+" of "+str(5)+".")
+df = pd.DataFrame(data=d)
 
-sc2 = st.schur_content(x2, number_of_factors=number_of_factors)
-index = [i for i in range(len(sc2))]
-columns = st.get_coordinate_labels()
-df2 = pd.DataFrame(log_scale(sc2), index=index, columns=columns)
+sc1_seq = st.sequential_schur_content(x1, number_of_factors=number_of_factors)
+modes = st.get_coordinate_labels()
+schurcontentseq = "sequential "+str(number_of_factors)+"-factor Schur content"
+d = {schurcontentseq: [], "Mode": [],"Case": []}
+for i in range(5):
+    xi = grab_from_4DCT(str(i+1))
+    sc = st.sequential_schur_content(xi, number_of_factors=number_of_factors)
+    for j in range(len(sc)):
+        for k in range(len(sc[j])):
+            d[schurcontentseq].append(single_log_scale(sc[j,k]))
+            d["Mode"].append(modes[k])
+            d["Case"].append(str(i+1))
+    print("Finished case "+str(i+1)+" of "+str(5)+". (Sequential version)")
+df_sequential = pd.DataFrame(data=d)
 
-sc3 = st.schur_content(x3, number_of_factors=number_of_factors)
-index = [i for i in range(len(sc3))]
-columns = st.get_coordinate_labels()
-df3 = pd.DataFrame(log_scale(sc3), index=index, columns=columns)
 
-print(df3)
+fig = plot.figure(figsize=(9,6))
+ax = sns.violinplot(x="Mode", y=schurcontent, data=df, inner="stick",scale="area",hue="Case",cut=0)
+fig.add_axes(ax)
 
-fig1 = plot.figure(figsize=(4,6))
-sns.set(style="whitegrid")
-ax1 = sns.violinplot(data=df1, inner="stick",scale="width")
-fig1.add_axes(ax1)
+fig_seq = plot.figure(figsize=(9,6))
+ax_seq = sns.violinplot(x="Mode", y=schurcontentseq, data=df_sequential, inner="stick",scale="area",hue="Case",cut=0)
+fig_seq.add_axes(ax_seq)
 
-fig2 = plot.figure(figsize=(4,6))
-sns.set(style="whitegrid")
-ax2 = sns.violinplot(data=df2, inner="stick",scale="width")
-fig2.add_axes(ax2)
+# fig_regrouped = plot.figure(figsize=(9,6))
+# ax_regrouped = sns.violinplot(x="Mode", y="Case", data=df, inner="stick",scale="area",hue=schurcontent,cut=0)
+# fig_regrouped.add_axes(ax_regrouped)
 
-fig3 = plot.figure(figsize=(4,6))
-sns.set(style="whitegrid")
-ax3 = sns.violinplot(data=df3, inner="stick",scale="width")
-fig3.add_axes(ax3)
+# fig_regrouped_seq = plot.figure(figsize=(9,6))
+# ax_regrouped_seq = sns.violinplot(x="Mode", y="Case", data=df_sequential, inner="stick",scale="area",hue=schurcontentseq,cut=0)
+# fig_regrouped_seq.add_axes(ax_regrouped_seq)
 
 plot.show()
 
