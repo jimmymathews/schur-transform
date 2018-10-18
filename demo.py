@@ -10,7 +10,7 @@ import seaborn as sns
 import pandas as pd
 sns.set(style="whitegrid")
 
-# Data available from www.dir-lab.com . I reformatted these files (removing tabs and spaces) as CSV (adding commas).
+# Data available from www.dir-lab.com . I reformatted the landmark files as CSV, removing tabs and whitespace and adding commas.
 def grab_from_4DCT(case):
     filenames=[
     "example_data/case"+case+"_4D-75_T00.txt",
@@ -52,7 +52,7 @@ number_of_factors = 4
 
 sc1 = st.schur_content(x1, number_of_factors=number_of_factors)
 modes = st.get_coordinate_labels()
-schurcontent = str(number_of_factors)+"-factor Schur content"
+schurcontent = str(number_of_factors)+"-factor Schur content (log scale)"
 d = {schurcontent: [], "Mode": [],"Case": []}
 for i in range(5):
     xi = grab_from_4DCT(str(i+1))
@@ -67,35 +67,27 @@ df = pd.DataFrame(data=d)
 
 sc1_seq = st.sequential_schur_content(x1, number_of_factors=number_of_factors)
 modes = st.get_coordinate_labels()
-schurcontentseq = "sequential "+str(number_of_factors)+"-factor Schur content"
-d = {schurcontentseq: [], "Mode": [],"Case": []}
+schurcontentseq = "sequential "+str(number_of_factors)+"-factor Schur content (log scale)"
+dseq = {schurcontentseq: [], "Mode": [],"Case": []}
 for i in range(5):
     xi = grab_from_4DCT(str(i+1))
     sc = st.sequential_schur_content(xi, number_of_factors=number_of_factors)
     for j in range(len(sc)):
         for k in range(len(sc[j])):
-            d[schurcontentseq].append(single_log_scale(sc[j,k]))
-            d["Mode"].append(modes[k])
-            d["Case"].append(str(i+1))
+            dseq[schurcontentseq].append(single_log_scale(sc[j,k]))
+            dseq["Mode"].append(modes[k])
+            dseq["Case"].append(str(i+1))
     print("Finished case "+str(i+1)+" of "+str(5)+". (Sequential version)")
-df_sequential = pd.DataFrame(data=d)
+df_sequential = pd.DataFrame(data=dseq)
 
 
-fig = plot.figure(figsize=(9,6))
+fig = plot.figure(figsize=(8,6))
 ax = sns.violinplot(x="Mode", y=schurcontent, data=df, inner="stick",scale="area",hue="Case",cut=0)
 fig.add_axes(ax)
 
-fig_seq = plot.figure(figsize=(9,6))
+fig_seq = plot.figure(figsize=(8,6))
 ax_seq = sns.violinplot(x="Mode", y=schurcontentseq, data=df_sequential, inner="stick",scale="area",hue="Case",cut=0)
 fig_seq.add_axes(ax_seq)
-
-# fig_regrouped = plot.figure(figsize=(9,6))
-# ax_regrouped = sns.violinplot(x="Mode", y="Case", data=df, inner="stick",scale="area",hue=schurcontent,cut=0)
-# fig_regrouped.add_axes(ax_regrouped)
-
-# fig_regrouped_seq = plot.figure(figsize=(9,6))
-# ax_regrouped_seq = sns.violinplot(x="Mode", y="Case", data=df_sequential, inner="stick",scale="area",hue=schurcontentseq,cut=0)
-# fig_regrouped_seq.add_axes(ax_regrouped_seq)
 
 plot.show()
 
