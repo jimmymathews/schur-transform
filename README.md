@@ -38,7 +38,7 @@ The `components` are the GL(k)- or Sn-isotypic components of the covariance tens
 
 **Recomputing precomputed values**. If you delete the character tables or projectors, they will be recomputed as needed. The calculation of character tables requires a local installation of Sage Math.
 
-**Demo**. *demo.py* is a more extensive usage example. It calculates the *Schur content* (many Schur transforms for various subsets of the series index) of a lung deformation as measured by an 4D CT scan. Data available for download from [DIR-lab](https://dir-lab.com).
+**Demo**. *demo.py* is a more extensive usage example. It calculates the *Schur content* (many Schur transforms for various subsets of the series index) of a lung deformation as measured by a 4D CT scan. Data available for download from [DIR-lab](https://dir-lab.com). Requires the Seaborn Python library (for violin plots) and Pandas.
 
 ![](combo_dirlab_sc.png)
 
