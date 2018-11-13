@@ -53,40 +53,52 @@ number_of_factors = 4
 sc1 = st.schur_content(x1, number_of_factors=number_of_factors)
 modes = st.get_coordinate_labels()
 schurcontent = str(number_of_factors)+"-factor Schur content (log scale)"
-d = {schurcontent: [], "Mode": [],"Case": []}
+d = {schurcontent: [], "Mode (Sn conjugacy class representative)": [],"Case": []}
 for i in range(5):
     xi = grab_from_4DCT(str(i+1))
     sc = st.schur_content(xi, number_of_factors=number_of_factors)
     for j in range(len(sc)):
         for k in range(len(sc[j])):
             d[schurcontent].append(single_log_scale(sc[j,k]))
-            d["Mode"].append(modes[k])
+            d["Mode (Sn conjugacy class representative)"].append(modes[k])
             d["Case"].append(str(i+1))
     print("Finished case "+str(i+1)+" of "+str(5)+".")
 df = pd.DataFrame(data=d)
 
 sc1_seq = st.sequential_schur_content(x1, number_of_factors=number_of_factors)
 modes = st.get_coordinate_labels()
-schurcontentseq = "sequential "+str(number_of_factors)+"-factor Schur content (log scale)"
-dseq = {schurcontentseq: [], "Mode": [],"Case": []}
+schurcontentseq = "Sequential "+str(number_of_factors)+"-factor Schur content (log scale)"
+dseq = {schurcontentseq: [], "Mode (Sn conjugacy class representative)": [],"Case": []}
 for i in range(5):
     xi = grab_from_4DCT(str(i+1))
     sc = st.sequential_schur_content(xi, number_of_factors=number_of_factors)
     for j in range(len(sc)):
         for k in range(len(sc[j])):
             dseq[schurcontentseq].append(single_log_scale(sc[j,k]))
-            dseq["Mode"].append(modes[k])
+            dseq["Mode (Sn conjugacy class representative)"].append(modes[k])
             dseq["Case"].append(str(i+1))
     print("Finished case "+str(i+1)+" of "+str(5)+". (Sequential version)")
 df_sequential = pd.DataFrame(data=dseq)
 
 
-fig = plot.figure(figsize=(8,6))
-ax = sns.violinplot(x="Mode", y=schurcontent, data=df, inner="stick",scale="area",hue="Case",cut=0)
+# plot.rcParams.update({'font.size': 24}
+
+fig = plot.figure(figsize=(7.5,5))
+ax = sns.violinplot(y="Mode (Sn conjugacy class representative)", x=schurcontent, data=df, inner="stick",scale="area",hue="Case",cut=0)
+# plot.setp(ax.get_legend().get_texts(), fontsize='22')
+plot.setp(ax.get_legend().get_title(), fontsize='22')
+plot.ylabel('Mode (Sn conjugacy class representative)', fontsize=16)
+plot.xlabel(schurcontent, fontsize=16)
+ax.grid(False)
 fig.add_axes(ax)
 
-fig_seq = plot.figure(figsize=(8,6))
-ax_seq = sns.violinplot(x="Mode", y=schurcontentseq, data=df_sequential, inner="stick",scale="area",hue="Case",cut=0)
+fig_seq = plot.figure(figsize=(7.5,5))
+ax_seq = sns.violinplot(y="Mode (Sn conjugacy class representative)", x=schurcontentseq, data=df_sequential, inner="stick",scale="area",hue="Case",cut=0)
+# plot.setp(ax_seq.get_legend().get_texts(), fontsize='22')
+plot.setp(ax_seq.get_legend().get_title(), fontsize='22')
+plot.ylabel('Mode (Sn conjugacy class representative)', fontsize=16)
+plot.xlabel(schurcontentseq, fontsize=16)
+ax_seq.grid(False)
 fig_seq.add_axes(ax_seq)
 
 plot.show()
