@@ -1,11 +1,11 @@
 Schur transform
 ===============
 
-This is an implementation of the algorithm described in *A Schur Transform for Spatial Stochastic Processes*. The transform calculates irreducible tensorial components of spatial covariances and joint moments.
+This is an implementation of the algorithm described in *A Schur Transform for Spatial Stochastic Processes*. The transform calculates irreducible tensorial components of spatial joint moments and their amplitudes.
 
 Let's say that your data are stored in a multi-dimensional array `v[i,j,a]`, where
 
-  - step index `i` ranges across `n` steps (e.g. time-steps, or cases)
+  - step index `i` ranges across `n` steps (e.g. time-steps)
   - sample index `j` ranges cross `N` samples (e.g. number of trajectories or landmarks)
   - spatial index `a` ranges across `k` dimensions (e.g. 3)
 
@@ -38,5 +38,8 @@ The `components` are the GL(k)- or Sn-isotypic components of the covariance tens
 
 **Recomputing precomputed values**. If you delete the character tables or projectors, they will be recomputed as needed. The calculation of character tables requires a local installation of Sage Math.
 
+**Demo**. *demo.py* is a more extensive usage example. It calculates the *Schur content* (many Schur transforms for various subsets of the series index) of a lung deformation as measured by an 4D CT scan. Data available for download from [DIR-lab](https://dir-lab.com).
+
+![](combo_dirlab_sc.png)
 
 *James Mathews 2018*
