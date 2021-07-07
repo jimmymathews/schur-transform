@@ -143,7 +143,7 @@ class SchurTransform:
                     aggregated_permutation_operator.scale_by(amount=character[cycle_type]),
                     inplace=True,
                 )
-            projectors[i].scale_by(amount=character['()'], inplace=True)
+            projectors[i].scale_by(amount=character['()'] / factorial(order), inplace=True)
         if not self.validate_projectors(projectors, symmetric_group):
             return None
         return projectors
@@ -163,9 +163,9 @@ class SchurTransform:
             dimension = dimension,
             identity = True,
         )
-        identity_scaled.scale_by(amount=factorial(order), inplace=True)
 
-        if not (accumulator.data == identity_scaled.data).all():
+        tolerance = np.linalg.norm(accumulator.data) / pow(10, 9)
+        if not np.linalg.norm(accumulator.data - identity_scaled.data) < tolerance:
             logger.error('Projectors do not sum to identity.')
             logger.error('Norm of defect: %s', np.linalg.norm(accumulator.data - identity_scaled.data))
             return False
@@ -208,11 +208,11 @@ class SchurTransform:
         return covariance_tensor
 
     def calculate_decomposition(self, tensor, projectors):
-        order = tensor.data.shape[0]
+        order = len(tensor.data.shape)
         decomposition = {}
         for i, projector in projectors.items():
             component = projector.apply(tensor)
-            component.scale_by(amount=1.0/factorial(order), inplace=True)
+            # component.scale_by(amount=1.0/factorial(order), inplace=True)
             decomposition[i] = component
         return decomposition
 
