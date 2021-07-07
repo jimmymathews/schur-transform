@@ -21,12 +21,15 @@ setuptools.setup(
     long_description=long_description,
     packages=[
         'schurtransform',
-        'schurtransform/character_tables',
+        'schurtransform.character_tables',
     ],
+    package_data={
+        'schurtransform': ['VERSION'],
+        'schurtransform.character_tables' : ['s2.csv', 's3.csv', 's4.csv', 's5.csv', 's6.csv'],
+    },
     classifiers=[
         'Programming Language :: Python :: 3',
     ],
-    package_data={'schurtransform': ['VERSION']},
     python_requires='>=3.8',
     install_requires=requirements,
 )

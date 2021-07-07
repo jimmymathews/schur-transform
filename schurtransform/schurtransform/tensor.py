@@ -85,6 +85,9 @@ class Tensor:
         if inplace:
             self.data = self.data * amount
         else:
-            tensor = Tensor(self.number_of_factors, self.dimension)
+            tensor = Tensor(
+                number_of_factors=self.number_of_factors,
+                dimension=self.dimension,
+            )
             tensor.data = self.data * amount
             return tensor

@@ -9,6 +9,8 @@ from math import factorial
 
 import numpy as np
 
+from .tensor import Tensor
+from .tensor_operator import TensorOperator
 from .symmetric_group_utilities import SymmetricGroupUtilities
 from .log_formats import colorized_logger
 logger = colorized_logger(__name__)
@@ -81,7 +83,7 @@ class SchurTransform:
             centered = self.recenter_at_mean(samples)
             covariance_tensor = self.calculate_covariance_tensor(centered)
             decomposition = self.calculate_decomposition(covariance_tensor, projectors)
-            if not self.validate_decomposition(decomposition):
+            if not self.validate_decomposition(decomposition, covariance_tensor):
                 return
 
             if summary_type == SummaryType.COMPONENTS:
@@ -122,16 +124,17 @@ class SchurTransform:
         }
         for i, character in enumerate(symmetric_group.characters):
             for cycle_type, aggregated_permutation_operator in aggregated_permutation_operators.items():
-                projector[i].add(
-                    aggregated_permutation_operator.scale_by(character[cycle_type])
+                projectors[i].add(
+                    aggregated_permutation_operator.scale_by(amount=character[cycle_type]),
+                    inplace=True,
                 )
-            projector[i].scale_by(character['()'], inplace=True)
+            projectors[i].scale_by(amount=character['()'], inplace=True)
         if not self.validate_projectors(projectors, symmetric_group):
             return None
         return projectors
 
     def validate_projectors(self, projectors, symmetric_group):
-        order = len(projectors[0].data.shape) / 2
+        order = int(len(projectors[0].data.shape) / 2)
         dimension = projectors[0].data.shape[2]
         accumulator = TensorOperator(
             number_of_factors=order,
@@ -145,12 +148,14 @@ class SchurTransform:
             dimension = dimension,
             identity = True,
         )
-        identify_scaled.scale_by(factorial(order), inplace=True)
+        identity_scaled.scale_by(amount=factorial(order), inplace=True)
 
         if not (accumulator.data == identity_scaled.data).all():
-            logger.error('Projects do not sum to identity.')
+            logger.error('Projectors do not sum to identity.')
+            logger.error('Norm of defect: %s', np.linalg.norm(accumulator.data - identity_scaled.data))
             return False
         else:
+            logger.debug('Projectors sum to identity.')
             return True
 
     def recenter_at_mean(self, samples):
@@ -159,7 +164,7 @@ class SchurTransform:
         dimension = samples.shape[2]
         means = np.array([[np.mean(samples[i,:,a]) for a in range(dimension)] for i in range(order)])
 
-        recentered = np.array(samples.shape)
+        recentered = np.zeros(samples.shape)
         for i in range(order):
             for a in range(dimension):
                 m = means[i,a]
@@ -175,7 +180,7 @@ class SchurTransform:
             number_of_factors=order,
             dimension=dimension,
         )
-        it = covariance_tensor.entry_iterator()
+        it = covariance_tensor.get_entry_iterator()
         for entry in it:
             M = it.multi_index
             it[0] = np.sum([
@@ -187,11 +192,12 @@ class SchurTransform:
 
     def calculate_decomposition(self, tensor, projectors):
         order = tensor.data.shape[0]
-        self.decomposition = {}
+        decomposition = {}
         for i, projector in projectors.items():
             component = projector.apply(tensor)
-            component.scale_by(1.0/factorial(order), inplace=True)
-            self.decomposition[i] = component
+            component.scale_by(amount=1.0/factorial(order), inplace=True)
+            decomposition[i] = component
+        return decomposition
 
     def validate_decomposition(self, decomposition, tensor):
         order = tensor.data.shape[0]
@@ -204,6 +210,9 @@ class SchurTransform:
             resummed.add(component, inplace=True)
         if not (resummed.data == tensor.data).all():
             logger.error('Components do not sum to original tensor.')
+            logger.error('Norm of defect: %s', np.linalg.norm(resummed.data - tensor.data))
+            logger.error('Norm of original tensor: %s', np.linalg.norm(tensor.data))
             return False
         else:
+            logger.debug('Components sum to original tensor.')
             return True
