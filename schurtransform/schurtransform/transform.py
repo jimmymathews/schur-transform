@@ -45,12 +45,23 @@ class SchurTransform:
                 Currently must be less than or equal to 6.
         Returns:
             array-like:
-                If ``summary_type`` is COMPONENTS, returns the tensor components of the Schur-Weyl decomposition of the joint moment tensor, the tensor product over the series index.
-                If ``summary_type`` is NORMS, returns the Euclidean norms of the tensor components of the Schur-Weyl decomposition.
-                If ``summary_type`` is CONTENT, returns a list of distributions, one for each tensor component type, consisting of the Euclidean norms of that component of the decomposition of all N-factor joint moments, where N is the given ``number_of_factors``.
-                If ``summary_type`` is SEQUENTIAL_CONTENT, returns a list of distributions just as in the CONTENT case, except that only consecutive N-fold products are considered.
-                If ``summary_type`` is MEAN_CONTENT, the means of the distributions obtained in the CONTENT case are provided (one for each tensor component type).
-                If ``summary_type`` is VARIANCE_CONTENT, the variances of the distributions obtained in the CONTENT case are provided.
+                If ``summary_type`` is COMPONENTS, returns the tensor components of the
+                Schur-Weyl decomposition of the joint moment tensor, the tensor product
+                over the series index.
+                If ``summary_type`` is NORMS, returns the Euclidean norms of the tensor
+                components of the Schur-Weyl decomposition.
+                If ``summary_type`` is CONTENT, returns a list of distributions, one for
+                each tensor component type, consisting of the Euclidean norms of that
+                component of the decomposition of all N-factor joint moments, where N is
+                the given ``number_of_factors``.
+                If ``summary_type`` is SEQUENTIAL_CONTENT, returns a list of
+                distributions just as in the CONTENT case, except that only consecutive
+                N-fold products are considered.
+                If ``summary_type`` is MEAN_CONTENT, the means of the distributions
+                obtained in the CONTENT case are provided (one for each tensor component
+                type).
+                If ``summary_type`` is VARIANCE_CONTENT, the variances of the
+                distributions obtained in the CONTENT case are provided.
         """
         if type(samples) is list:
             samples = np.array(samples)
@@ -73,6 +84,11 @@ class SchurTransform:
                 )
                 return
 
+        logger.debug(
+            'Calculating projectors of type order=%s and dimension=%s.',
+            order,
+            dimension,
+        )
         projectors = self.recalculate_projectors(
             number_of_samples=number_of_samples,
             dimension=dimension,
@@ -83,8 +99,7 @@ class SchurTransform:
             centered = self.recenter_at_mean(samples)
             covariance_tensor = self.calculate_covariance_tensor(centered)
             decomposition = self.calculate_decomposition(covariance_tensor, projectors)
-            if not self.validate_decomposition(decomposition, covariance_tensor):
-                return
+            self.validate_decomposition(decomposition, covariance_tensor)
 
             if summary_type == SummaryType.COMPONENTS:
                 return decomposition
@@ -188,6 +203,8 @@ class SchurTransform:
                     samples[i, j, M[i]] for i in range(order)
                 ]) for j in range(number_of_samples)
             ])
+        if (covariance_tensor.data == 0).all():
+            logger.warning('Covariance tensor is identically 0.')
         return covariance_tensor
 
     def calculate_decomposition(self, tensor, projectors):
@@ -200,15 +217,16 @@ class SchurTransform:
         return decomposition
 
     def validate_decomposition(self, decomposition, tensor):
-        order = tensor.data.shape[0]
-        dimension = tensor.data.shape[2]
+        order = len(tensor.data.shape)
+        dimension = tensor.data.shape[0]
         resummed = Tensor(
             number_of_factors = order,
             dimension = dimension,
         )
         for i, component in decomposition.items():
             resummed.add(component, inplace=True)
-        if not (resummed.data == tensor.data).all():
+        tolerance = np.linalg.norm(tensor.data) / pow(10, 9)
+        if not np.linalg.norm(resummed.data - tensor.data) < tolerance:
             logger.error('Components do not sum to original tensor.')
             logger.error('Norm of defect: %s', np.linalg.norm(resummed.data - tensor.data))
             logger.error('Norm of original tensor: %s', np.linalg.norm(tensor.data))

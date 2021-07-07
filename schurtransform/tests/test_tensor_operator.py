@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import itertools
 
 import schurtransform
 from schurtransform.tensor import Tensor
@@ -71,4 +72,67 @@ def test_arithmetic():
         I = reader.multi_index
         original_entry = tensor.data[I[0], I[1], I[2]]
         assert(entry == 8 * original_entry)
+
+def test_additivity_over_input_tensor():
+    tolerance = 1.0 / pow(10, 9)
+    random_tensors = []
+    for i in range(10):
+        tensor = Tensor(number_of_factors=4, dimension=2)
+        writer = tensor.get_entry_iterator()
+        for entry in writer:
+            writer[0] = random.random()
+        random_tensors.append(tensor)
+
+    operator = TensorOperator(number_of_factors=4, dimension=2)
+    writer = np.nditer(operator.data, flags = ['multi_index'], op_flags=['readwrite'])
+    for entry in writer:
+        writer[0] = random.random()
+
+    for j in range(5):
+        combos = itertools.combinations(random_tensors, j)
+        for combo in combos:
+            sum1 = Tensor(number_of_factors=4, dimension=2)
+            for tensor in combo:
+                sum1.add(tensor, inplace=True)
+            result1 = operator.apply(sum1)
+
+            sum2 = Tensor(number_of_factors=4, dimension=2)
+            for tensor in combo:
+                sum2.add(operator.apply(tensor), inplace=True)
+            result2 = sum2
+
+            assert(np.linalg.norm(result1.data - result2.data) < tolerance)
+
+def test_additivity_over_operator():
+    tolerance = 1.0 / pow(10, 9)
+    random_operators = []
+    for i in range(10):
+        operator = TensorOperator(number_of_factors=4, dimension=2)
+        writer = np.nditer(operator.data, flags = ['multi_index'], op_flags=['readwrite'])
+        for entry in writer:
+            writer[0] = random.random()
+        random_operators.append(operator)
+
+    tensor = Tensor(number_of_factors=4, dimension=2)
+    writer = tensor.get_entry_iterator()
+    for entry in writer:
+        writer[0] = random.random()
+
+    for j in range(5):
+        combos = itertools.combinations(random_operators, j)
+        for combo in combos:
+            sum1 = TensorOperator(number_of_factors=4, dimension=2)
+            for operator in combo:
+                sum1.add(operator, inplace=True)
+            result1 = sum1.apply(tensor)
+
+            sum2 = TensorOperator(number_of_factors=4, dimension=2)
+            for operator in combo:
+                sum2.add(operator.apply(tensor), inplace=True)
+            result2 = sum2
+
+            assert(np.linalg.norm(result1.data - result2.data) < tolerance)
+
+
+
 

@@ -90,9 +90,11 @@ class TensorOperator:
         for output_entry in iterator_output:
             I = iterator_output.multi_index
             iterator_input = input_tensor.get_entry_iterator()
+            accumulator = 0
             for input_entry in iterator_input:
                 J = iterator_input.multi_index
-                iterator_output[0] = iterator_output[0] + self.data[I + J] * iterator_input[0]
+                accumulator += self.data[I + J] * iterator_input[0]
+            iterator_output[0] = accumulator
         return output_tensor
 
     def add(self,
