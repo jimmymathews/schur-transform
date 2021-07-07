@@ -49,7 +49,7 @@ def test_partitioning_permutation():
 
 def test_build_conjugacy_classes():
     u = SymmetricGroupUtilities(order=3)
-    conjugacy_classes = u.list_permutations_by_conjugacy_class()
+    conjugacy_classes = u.compute_conjugacy_classes()
     assert(conjugacy_classes == {
         '()' : [(1, 2, 3)],
         '(1 2)' : [(1, 3, 2), (2, 1, 3), (3, 2, 1)],

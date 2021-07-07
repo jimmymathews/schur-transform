@@ -111,7 +111,7 @@ class SymmetricGroupUtilities:
                 del by_index[entry]
         return tuple(sorted([len(cycle) for cycle in cycles]))
 
-    def list_permutations_by_conjugacy_class(self):
+    def compute_conjugacy_classes(self):
         """
         Returns:
             dict:
