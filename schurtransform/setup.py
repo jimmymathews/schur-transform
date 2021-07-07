@@ -21,6 +21,7 @@ setuptools.setup(
     long_description=long_description,
     packages=[
         'schurtransform',
+        'schurtransform/character_tables',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
