@@ -20,9 +20,9 @@ The contents of `s3.csv` look like this:
 |2+1|-1|0|1|
 |3|1|-1|1|
 
-Care was taken to ensure that the character functions themselves (the rows) are appropriately labelled by integer partitions. The ability to ensure this was one reason that we opted to use GAP directly rather than the SageMath wrapper around GAP.
+Care was taken to ensure that the character functions themselves (the rows) are appropriately labelled by integer partitions. The desire to ensure this was one reason that we opted to use GAP directly rather than the SageMath wrapper around GAP.
 
-The contents of `symmetric_group_conjugacy_classes.csv` looks like this:
+The contents of `symmetric_group_conjugacy_classes.csv` look like this:
 
 |Symmetric group|Partition|Conjugacy class size|
 |---------------|---------|--------------------|
