@@ -20,7 +20,7 @@ The contents of `s3.csv` look like this:
 |2+1|-1|0|1|
 |3|1|-1|1|
 
-Care was taken to ensure that the character functions themselves (the rows) are appropriately labelled by integer partitions. The desire to ensure this was one reason that we opted to use GAP directly rather than the SageMath wrapper around GAP.
+Each row provides the values of one irreducible character function. Care was taken to ensure that these rows are appropriately labelled by integer partitions. The desire to ensure this was one reason that we opted to use GAP directly rather than the SageMath wrapper around GAP.
 
 The contents of `symmetric_group_conjugacy_classes.csv` look like this:
 
