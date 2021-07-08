@@ -4,6 +4,8 @@ import os
 from os.path import join
 import functools
 from functools import lru_cache
+import itertools
+from itertools import combinations
 import math
 from math import factorial
 
@@ -117,11 +119,12 @@ class SchurTransform:
             if summary_type == SummaryType.SEQUENTIAL_CONTENT:
                 index_combinations = [[i + j for j in range(order)] for i in range(number_of_series-(order-1))]
             else:
-                index_combinations = itertools.combinations(list(range(number_of_series)), order)
+                index_combinations = combinations(list(range(number_of_series)), order)
 
+            symmetric_group = SymmetricGroupUtilities(order=order)
             content = {i : [] for i in range(len(symmetric_group.characters))}
             for combination in index_combinations:
-                subsample = samples[:, list(combination), :]
+                subsample = samples[list(combination), :, :]
                 centered = self.recenter_at_mean(subsample)
                 covariance_tensor = self.calculate_covariance_tensor(centered)
                 decomposition = self.calculate_decomposition(covariance_tensor, projectors)
