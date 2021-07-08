@@ -67,8 +67,9 @@ class SchurTransform:
             samples = np.array(samples)
 
         if len(samples.shape) != 3:
-            logger.error('Expected 3 axes: series, sample, and spatial coordinate. Got axes of sizes: %s', samples.shape)
+            logger.error('Expected 3 axes: series (random variable), sample, and spatial coordinate. Got axes of sizes: %s', samples.shape)
             return
+
         number_of_series = samples.shape[0]
         number_of_samples= samples.shape[1]
         dimension = samples.shape[2]
@@ -106,6 +107,37 @@ class SchurTransform:
 
             if summary_type == SummaryType.NORMS:
                 return {i: np.linalg.norm(component.data) for i, component in decomposition.items()}
+
+        if summary_type in [
+            SummaryType.CONTENT,
+            SummaryType.SEQUENTIAL_CONTENT,
+            SummaryType.MEAN_CONTENT,
+            SummaryType.VARIANCE_CONTENT,
+        ]:
+            if summary_type == SummaryType.SEQUENTIAL_CONTENT:
+                index_combinations = [[i + j for j in range(order)] for i in range(number_of_series-(order-1))]
+            else:
+                index_combinations = itertools.combinations(list(range(number_of_series)), order)
+
+            content = {i : [] for i in range(len(symmetric_group.characters))}
+            for combination in index_combinations:
+                subsample = samples[:, list(combination), :]
+                centered = self.recenter_at_mean(subsample)
+                covariance_tensor = self.calculate_covariance_tensor(centered)
+                decomposition = self.calculate_decomposition(covariance_tensor, projectors)
+                self.validate_decomposition(decomposition, covariance_tensor)
+                norms = {i: np.linalg.norm(component.data) for i, component in decomposition.items()}
+                for i, norm in norms.items():
+                    content[i].append(norm)
+
+            if summary_type is SummaryType.CONTENT:
+                return content
+            if summary_type is SummaryType.SEQUENTIAL_CONTENT:
+                return content
+            if summary_type is SummaryType.MEAN_CONTENT:
+                return {i : np.mean(content[i]) for i in content.keys()}
+            if summary_type is SummaryType.VARIANCE_CONTENT:
+                return {i : np.var(content[i]) for i in content.keys()}
 
     @lru_cache(maxsize=1)
     def recalculate_projectors(self,
