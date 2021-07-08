@@ -1,4 +1,4 @@
-for i in [2..6] do
+for i in [2..8] do
 tbl:=CharacterTable("symmetric", i);
 Print("Character table GAP output magic header separator\n");
 Print("Begin section: Rank of symmetric group\n");
