@@ -19,3 +19,39 @@ The contents of `s3.csv` look like this:
 |1+1+1|1|2|1|
 |2+1|-1|0|1|
 |3|1|-1|1|
+
+Care was taken to ensure that the character functions themselves (the rows) are appropriately labelled by integer partitions.
+
+The contents of `symmetric_group_conjugacy_classes.csv` looks like this:
+
+|Symmetric group|Partition|Conjugacy class size|
+|---------------|---------|--------------------|
+|S2|1+1|1|
+|S2|2|1|
+|S3|1+1+1|1|
+|S3|2+1|3|
+|S3|3|2|
+|S4|1+1+1+1|1|
+|S4|2+1+1|6|
+|S4|2+2|3|
+|S4|3+1|8|
+|S4|4|6|
+|S5|1+1+1+1+1|1|
+|S5|2+1+1+1|10|
+|S5|2+2+1|15|
+|S5|3+1+1|20|
+|S5|3+2|20|
+|S5|4+1|30|
+|S5|5|24|
+|S6|1+1+1+1+1+1|1|
+|S6|2+1+1+1+1|15|
+|S6|2+2+1+1|45|
+|S6|2+2+2|15|
+|S6|3+1+1+1|40|
+|S6|3+2+1|120|
+|S6|3+3|40|
+|S6|4+1+1|90|
+|S6|4+2|90|
+|S6|5+1|144|
+|S6|6|120|
+|...|...|...|
