@@ -1,11 +1,9 @@
 import numpy as np
 
-import schurtransform
+import schurtransform as st
 from schurtransform.transform import SchurTransform
 
 def test_transform_norms():
-    st = SchurTransform()
-
     samples = [
         [[4,2], [4.01,2.1], [3.9,2.2]],
         [[3.99,2.1], [3.7,2.1] ,[4.0,2.2]],
@@ -26,7 +24,6 @@ def test_transform_norms():
 
 def test_decomposition_recomposition():
     t = SchurTransform()
-
     samples = [
         [[4,2], [4.01,2.1], [3.9,2.2]],
         [[3.99,2.1], [3.7,2.1] ,[4.0,2.2]],

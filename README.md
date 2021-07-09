@@ -1,18 +1,29 @@
 Schur transform
 ===============
 
-This is an implementation of the algorithm described in [*A Schur Transform for Spatial Stochastic Processes*](https://arxiv.org/abs/1811.06221). The transform calculates irreducible tensorial components of spatial joint moments and their amplitudes. See also Persi Diaconis' [Group Representations in Probability and Statistics](https://www.jstor.org/stable/4355560) for background on the non-abelian Fourier transform in the context of the symmetric group.
+The Fourier-Schur transform is an analogue of Fourier analysis in which the time domain and corresponding cyclic symmetry are replaced by the spatial joint moment tensor domain and permutation symmetry. It is used to derive natural higher-order statistics for "registered" spatial datasets.
 
-Let's say that your data are stored in a multi-dimensional array `v[i,j,a]`, where
+This repository contains an implementation of the algorithm described in [*A Schur Transform for Spatial Stochastic Processes*](https://arxiv.org/abs/1811.06221). The transform calculates irreducible tensorial components of spatial joint moments and their amplitudes. See also Persi Diaconis' [Group Representations in Probability and Statistics](https://www.jstor.org/stable/4355560) for background on the non-abelian Fourier transform in the context of the symmetric group.
 
-  - step index `i` ranges across `n` steps (e.g. time-steps)
+Let's say that your data are stored in a multi-dimensional array `v[i,j,a]` (or similar list-of-list-of-lists), where
+
+  - step index `i` ranges across `n` steps (e.g. time-steps, or random variables)
   - sample index `j` ranges cross `N` samples (e.g. number of trajectories or landmarks)
-  - spatial index `a` ranges across `k` dimensions (e.g. 3)
+  - spatial index `a` ranges across `k` dimensions (e.g. `k=3`)
 
 The following shows example usage:
 
-```
-<<example usage>>
+```python
+import schurtransform as st
+samples = [
+    [[4,2], [4.01,2.1], [3.9,2.2]],
+    [[3.99,2.1], [3.7,2.1] ,[4.0,2.2]],
+    [[4.4,1.9], [4.3,1.8], [4.3,1.8]],
+    [[4.6,2.0], [4.1,1.8], [4.3,1.7]],
+]
+decomposition = st.transform(
+    samples=samples,
+)
 ```
 
 ```
