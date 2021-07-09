@@ -46,7 +46,7 @@ print(decomposition['3+1'].data)
 #       [ 5.61111111e-05  0.00000000e+00]]]]
 ```
 
-The `components` are the GL(k)- or Sn-isotypic components of the covariance tensor of `data` in the tensor space with `n` tensor factors and `k` dimensions for each factor. Each one is presented as a multi-dimensional numpy array with `n` indices ranging across `k` values.
+The components are the GL(k)- or Sn-isotypic components of the covariance tensor of `data` in the tensor space with `n` tensor factors and `k` dimensions for each factor. Each one is presented as a multi-dimensional numpy array with `n` indices ranging across `k` values.
 
 The library ships with the character tables up to S8. For more than 8-fold statistics, see [generate_characters/](generate_characters/) for information about using [GAP](https://www.gap-system.org/) to generate additional character tables.
 
