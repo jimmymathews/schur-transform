@@ -200,8 +200,9 @@ class SchurTransform:
         return projectors
 
     def validate_projectors(self, projectors, symmetric_group):
-        order = int(len(projectors[0].data.shape) / 2)
-        dimension = projectors[0].data.shape[2]
+        identity = symmetric_group.get_identity_partition_string()
+        order = int(len(projectors[identity].data.shape) / 2)
+        dimension = projectors[identity].data.shape[2]
         accumulator = TensorOperator(
             number_of_factors=order,
             dimension=dimension,
@@ -261,9 +262,9 @@ class SchurTransform:
     def calculate_decomposition(self, tensor, projectors):
         order = len(tensor.data.shape)
         decomposition = {}
-        for i, projector in projectors.items():
+        for partition_string, projector in projectors.items():
             component = projector.apply(tensor)
-            decomposition[i] = component
+            decomposition[partition_string] = component
         return decomposition
 
     def validate_decomposition(self, decomposition, tensor):

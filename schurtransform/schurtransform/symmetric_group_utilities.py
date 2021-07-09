@@ -46,17 +46,17 @@ class SymmetricGroupUtilities:
             character_table = pd.read_csv(path, index_col=0)
 
         with importlib.resources.path(character_tables, 'symmetric_group_conjugacy_classes.csv') as path:
-            conjugacy_classes = pd.read_csv(path, index=False)
+            conjugacy_classes = pd.read_csv(path, index_col=False)
 
         conjugacy_classes = conjugacy_classes[conjugacy_classes['Symmetric group'] == 'S' + str(self.order)]
         self.conjugacy_class_sizes = {}
         for i, row in conjugacy_classes.iterrows():
-            self.conjugacy_class_sizes[row['Partition']] = row['Class size']
+            self.conjugacy_class_sizes[row['Partition']] = row['Conjugacy class size']
 
         self.conjugacy_class_representatives = [str(entry) for entry in list(conjugacy_classes['Partition'])]
 
         self.characters = {}
-        for index, row in df.iterrows():
+        for index, row in character_table.iterrows():
             self.characters[index] = {
                 key : row[key] for key in row.keys()
             }
@@ -131,7 +131,7 @@ class SymmetricGroupUtilities:
         return tuple(sorted([len(cycle) for cycle in cycles]))
 
     def get_identity_partition_string(self):
-        return '+'.join([1]*self.order)
+        return '+'.join(['1']*self.order)
 
     def get_characters(self):
         return self.characters
@@ -148,9 +148,9 @@ class SymmetricGroupUtilities:
         """
         partition_strings = self.conjugacy_class_representatives
         partition_strings_by_partition = {
-            sorted([
+            tuple(sorted([
                 int(entry) for entry in partition_string.split('+')
-            ], ascending=False) : partition_string for partitiong_string in partition_strings
+            ])) : partition_string for partition_string in partition_strings
         }
         permutations_by_partition_string = {
             partition_string : [] for partition_string in partition_strings
