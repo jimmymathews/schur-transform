@@ -5,7 +5,7 @@ Fourier-Schur analysis is an analogue of Fourier analysis in which the time doma
 
 This repository contains an implementation of the algorithm described in [*A Schur Transform for Spatial Stochastic Processes*](https://arxiv.org/abs/1811.06221). The transform calculates irreducible tensorial components of spatial joint moments and their amplitudes. See also Persi Diaconis' [Group Representations in Probability and Statistics](https://www.jstor.org/stable/4355560) for background on the non-abelian Fourier transform in the context of the symmetric group.
 
-Let's say that your data are stored in a multi-dimensional array `v[i,j,a]` (or similar list-of-list-of-lists), where
+Suppose that your data are stored in a multi-dimensional array `data[i,j,a]` (or similar list-of-list-of-lists), where
 
   - step index `i` ranges across `n` steps (e.g. time-steps, or random variables)
   - sample index `j` ranges cross `N` samples (e.g. number of trajectories or landmarks)
@@ -16,14 +16,14 @@ The following shows example usage:
 ```python
 import schurtransform as st
 
-samples = [
+data = [
     [[4,2], [4.01,2.1], [3.9,2.2]],
     [[3.99,2.1], [3.7,2.1] ,[4.0,2.2]],
     [[4.4,1.9], [4.3,1.8], [4.3,1.8]],
     [[4.6,2.0], [4.1,1.8], [4.3,1.7]],
 ]
 decomposition = st.transform(
-    samples=samples,
+    samples=data,
 )
 print(list(decomposition.keys()))
 print(decomposition['3+1'].data)
@@ -46,10 +46,10 @@ print(decomposition['3+1'].data)
 #       [ 5.61111111e-05  0.00000000e+00]]]]
 ```
 
-The `components` are the GL(k)- or Sn-isotypic components of the covariance tensor of `v` in the tensor space with `n` tensor factors and `k` dimensions for each factor. Each one is presented as a multi-dimensional numpy array with `n` indices ranging across `k` values.
+The `components` are the GL(k)- or Sn-isotypic components of the covariance tensor of `data` in the tensor space with `n` tensor factors and `k` dimensions for each factor. Each one is presented as a multi-dimensional numpy array with `n` indices ranging across `k` values.
 
-**Recomputing precomputed values**. If you delete the character tables or projectors, they will be recomputed as needed. The calculation of character tables requires a local installation of Sage Math.
+The library ships with the character tables up to S8. For more than 8-fold statistics, see [generate_characters/](generate_characters/) for information about using [GAP](https://www.gap-system.org/) to generate additional character tables.
 
-**Demo**. *demo.py* is a more extensive usage example. It calculates the *Schur content* (many Schur transforms for various subsets of the series index) of a lung deformation as measured by a 4D CT scan. Data available for download from [DIR-lab](https://dir-lab.com). Requires the Seaborn Python library (for violin plots) and Pandas.
+**Demo**. *demo.py* is a more extensive usage example. It calculates the *Schur content* (many Schur transforms for various subsets of the series index) of a lung deformation as measured by a 4D CT scan. Data available for download from [DIR-lab](https://dir-lab.com). The plotting requires the Seaborn Python library for violin plots.
 
 ![alttext](combo_dirlab_sc.png)
