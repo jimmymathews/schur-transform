@@ -12,7 +12,7 @@ from .log_formats import colorized_logger
 logger = colorized_logger(__name__)
 
 
-class SymmetricGroupUtilities:
+class CharacterTable:
     """
     Helper functions for working with permutation groups and their characters.
     """
@@ -60,47 +60,6 @@ class SymmetricGroupUtilities:
             self.characters[index] = {
                 key : row[key] for key in row.keys()
             }
-
-        # self.conjugacy_class_representatives = list(df.iloc[1])
-        # keys = self.conjugacy_class_representatives
-        # conjugacy_class_sizes = list(df.iloc[0])
-
-        # self.conjugacy_class_sizes = {keys[i]:int(conjugacy_class_sizes[i]) for i in range(len(keys))}
-        # for i, row in df.iterrows():
-        #     if i < 2:
-        #         continue
-        #     self.characters.append({keys[i]:int(row[i]) for i in range(len(row))})
-
-    @staticmethod
-    def partition_from_cycle_type(
-        cycle_type: str=None,
-        partitioned_integer: int=None,
-    ):
-        """
-        Args:
-            cycle_type (str):
-                The format should be as in '(1 2)(3 4)'. The parentheses are mandatory,
-                and the spacing is somewhat optional in that other characters may be
-                used as spacers as long as they are non-digits.
-            partitioned_integer (int):
-                The integer partitioned (i.e. the largest integer which would appear in
-                a complete cycle notation in which length-one cycles are included.)
-
-        Returns:
-            list:
-                The sorted list of integers which partition ``partitioned_integer``,
-                represented by the given cycle type.
-        """
-        cycles = re.findall(r'\(([\s\d]+)\)', cycle_type)
-        if(len(cycles)<1):
-            return tuple([1 for i in range(partitioned_integer)])
-
-        partition = []
-        for cycle in cycles:
-            numbers = re.findall(r'(\d+)', cycle)
-            partition.append(len(numbers))
-
-        return tuple(sorted(partition + [1 for w in range(partitioned_integer - sum(partition))]))
 
     @staticmethod
     def partition_from_permutation(permutation):

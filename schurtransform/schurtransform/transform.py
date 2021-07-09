@@ -13,7 +13,7 @@ import numpy as np
 
 from .tensor import Tensor
 from .tensor_operator import TensorOperator
-from .symmetric_group_utilities import SymmetricGroupUtilities
+from .character_table import CharacterTable
 from .log_formats import colorized_logger
 logger = colorized_logger(__name__)
 
@@ -136,7 +136,7 @@ class SchurTransform:
             else:
                 index_combinations = combinations(list(range(number_of_series)), order)
 
-            symmetric_group = SymmetricGroupUtilities(order=order)
+            symmetric_group = CharacterTable(order=order)
             content = {key : [] for key in symmetric_group.get_characters().keys()}
             for combination in index_combinations:
                 subsample = samples[list(combination), :, :]
@@ -163,7 +163,7 @@ class SchurTransform:
         dimension: int=None,
         order: int=None,
     ):
-        symmetric_group = SymmetricGroupUtilities(order=order)
+        symmetric_group = CharacterTable(order=order)
         conjugacy_classes = symmetric_group.get_conjugacy_classes()
         aggregated_permutation_operators = {
             partition_string : TensorOperator(
