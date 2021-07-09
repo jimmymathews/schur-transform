@@ -1,7 +1,7 @@
 import numpy as np
 
 import schurtransform
-from schurtransform.transform import SchurTransform, SummaryType
+from schurtransform.transform import SchurTransform
 
 def test_transform_norms():
     st = SchurTransform()
@@ -14,7 +14,6 @@ def test_transform_norms():
     ]
     decomposition = st.transform(
         samples=samples,
-        summary_type=SummaryType.COMPONENTS,
     )
 
     samples = [
@@ -23,7 +22,6 @@ def test_transform_norms():
     ]
     decomposition = st.transform(
         samples=samples,
-        summary_type=SummaryType.COMPONENTS,
     )
 
 def test_decomposition_recomposition():

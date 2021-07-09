@@ -57,6 +57,6 @@ def test_build_conjugacy_classes():
     conjugacy_classes = u.get_conjugacy_classes()
     assert(conjugacy_classes == {
         '1+1+1' : [(1, 2, 3)],
-        '1+2' : [(1, 3, 2), (2, 1, 3), (3, 2, 1)],
+        '2+1' : [(1, 3, 2), (2, 1, 3), (3, 2, 1)],
         '3' : [(2, 3, 1), (3, 1, 2)],
     })
