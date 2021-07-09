@@ -14,7 +14,7 @@ logger = colorized_logger(__name__)
 
 class CharacterTable:
     """
-    Helper functions for working with permutation groups and their characters.
+    Wrapper over a GAP-provided symmetric group character table.
     """
     def __init__(self,
         order: int=None,

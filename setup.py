@@ -12,7 +12,7 @@ with open(os.path.join(dir, 'requirements.txt'), 'r', encoding='utf-8') as fh:
 with open(os.path.join(dir, 'VERSION')) as fh:
     version = fh.read().rstrip('\n')
 
-with open(os.path.join(dir, 'examples_manifest.txt')) as fh:
+with open(os.path.join(dir, 'schurtransform', 'lung_data', 'examples_manifest.txt')) as fh:
     example_files = fh.read().split('\n')
 
 setuptools.setup(
@@ -29,7 +29,7 @@ setuptools.setup(
     package_data={
         'schurtransform': ['VERSION'],
         'schurtransform.character_tables' : ['s2.csv', 's3.csv', 's4.csv', 's5.csv', 's6.csv', 's7.csv', 's8.csv', 'symmetric_group_conjugacy_classes.csv'],
-        'schurtransform.lung_data' : example_files,
+        'schurtransform.lung_data' : example_files + ['examples_manifest.txt'],
     },
     classifiers=[
         'Programming Language :: Python :: 3',
