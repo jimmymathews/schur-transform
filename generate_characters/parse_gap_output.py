@@ -62,7 +62,7 @@ class CharacterTableGAPTextParser:
                     domain_labels[j] : characters[i][j] for j in range(len(domain_labels))
                 } for i in range(len(character_labels))
             }
-            df = pd.DataFrame(records)
+            df = pd.DataFrame(records).transpose()
             for j in range(len(domain_labels)):
                 conjugacy_class_records.append({
                     'Symmetric group' : 'S' + str(rank),
