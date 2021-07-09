@@ -20,7 +20,7 @@ class CharacterTableGAPTextParser:
 
         return pairs
 
-    def get_tables(self):
+    def create_tables(self):
         pairs = self.get_ordered_key_value_pairs()
         headers = [
             'Rank of symmetric group',
@@ -80,14 +80,5 @@ input_filename = sys.argv[1]
 with open(input_filename) as file:
     text = file.read()
 
-# lines = text.split('\n')
-
-# pages = text.split('Character table GAP output magic header separator\n')
-# pages = pages[1:len(pages)]
-# tables = {}
-# for page in pages:
-#     parser = CharacterTableGAPTextParser(page)
-#     parser.get_tables()
-
 parser = CharacterTableGAPTextParser(text)
-parser.get_tables()
+parser.create_tables()
