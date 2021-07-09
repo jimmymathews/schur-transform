@@ -1,7 +1,7 @@
-Schur transform
-===============
+schurtransform
+==============
 
-The Fourier-Schur transform is an analogue of Fourier analysis in which the time domain and corresponding cyclic symmetry are replaced by the spatial joint moment tensor domain and permutation symmetry. It is used to derive natural higher-order statistics for "registered" spatial datasets.
+Fourier-Schur analysis is an analogue of Fourier analysis in which the time domain and corresponding cyclic symmetry are replaced by the spatial joint moment tensor domain and permutation symmetry. It is used to derive natural higher-order statistics for "registered" spatial datasets.
 
 This repository contains an implementation of the algorithm described in [*A Schur Transform for Spatial Stochastic Processes*](https://arxiv.org/abs/1811.06221). The transform calculates irreducible tensorial components of spatial joint moments and their amplitudes. See also Persi Diaconis' [Group Representations in Probability and Statistics](https://www.jstor.org/stable/4355560) for background on the non-abelian Fourier transform in the context of the symmetric group.
 
