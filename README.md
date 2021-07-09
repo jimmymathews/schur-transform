@@ -24,18 +24,21 @@ samples = [
 decomposition = st.transform(
     samples=samples,
 )
-```
 
-```
-Firing up Sage.
-Calculating S6 characters.
-Saved to character_tables/s6.csv
-Calculating projectors.
-Projectors sum to identity operator.
-Saved projectors to projectors/dim2/steps6/*.npy
+decomposition['3+1'].data
 
-...
-
+>>  array([[[[ 0.00000000e+00,  4.44722222e-05],
+>>           [ 3.48055556e-05, -3.82222222e-05]],
+>>
+>>          [[ 2.09166667e-05,  6.05555556e-05],
+>>           [ 1.22222222e-05, -4.38888889e-05]]],
+>>
+>>
+>>         [[[-1.00194444e-04, -1.22222222e-05],
+>>           [-6.05555556e-05, -6.83333333e-05]],
+>>
+>>          [[ 3.82222222e-05,  5.61111111e-05],
+>>           [ 5.61111111e-05,  0.00000000e+00]]]])
 ```
 
 The `components` are the GL(k)- or Sn-isotypic components of the covariance tensor of `v` in the tensor space with `n` tensor factors and `k` dimensions for each factor. Each one is presented as a multi-dimensional numpy array with `n` indices ranging across `k` values.
