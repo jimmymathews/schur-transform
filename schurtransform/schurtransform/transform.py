@@ -30,8 +30,10 @@ class SummaryType(Enum):
 class SchurTransform:
     def transform(self,
         samples,
-        summary_type: SummaryType=SummaryType.COMPONENTS,
+        summary_type: str='COMPONENTS',
         number_of_factors: int=None,
+        character_table_filename: str=None,
+        conjugacy_classes_table_filename: str=None,
     ):
         """
         Args:
@@ -39,12 +41,24 @@ class SchurTransform:
                 A multi-dimensional array, or nested list of lists of lists. The axis
                 indices are respectively: the index indicating the series, the sample
                 index, and the spatial coordinate index.
-            summary_type (SummaryType):
-                See cases for return value.
+            summary_type (str):
+                See the enum class ``SummaryType``, and the cases for return value.
             number_of_factors (int):
                 In case of one of the "...CONTENT" summary types, this integer provides
-                the number of factors (number of series) used in the joint moment.
-                Currently must be less than or equal to 6.
+                the number of factors (number of variables) used in the joint moment.
+                Currently must be less than or equal to 8, unless you provide your own
+                character table and conjugacy class information.
+            character_table_filename (str):
+                Only provide this argument if you wish to supply a character table for a
+                symmetric group of rank higher than 8 (beyond S8). Use the file format
+                exemplified by ``s2.csv``, ``s3.csv``, etc. under the
+                ``character_tables`` subpackage.
+            conjugacy_classes_table_filename (str):
+                Only provide this argument if you wish to supply a character table for a
+                symmetric group of rank higher than 8 (beyond S8). Use the file format
+                exemplified by ``symmetric_group_conjugacy_classes.csv`` in the
+                ``character_tables`` subpackage.
+
         Returns:
             array-like:
                 If ``summary_type`` is COMPONENTS, returns the tensor components of the
@@ -76,6 +90,7 @@ class SchurTransform:
         number_of_samples= samples.shape[1]
         dimension = samples.shape[2]
 
+        summary_type = SummaryType[summary_type]
         if summary_type in [SummaryType.COMPONENTS, SummaryType.NORMS]:
             order = number_of_series
         else:
@@ -122,7 +137,7 @@ class SchurTransform:
                 index_combinations = combinations(list(range(number_of_series)), order)
 
             symmetric_group = SymmetricGroupUtilities(order=order)
-            content = {i : [] for i in range(len(symmetric_group.characters))}
+            content = {key : [] for key in symmetric_group.get_characters().keys()}
             for combination in index_combinations:
                 subsample = samples[list(combination), :, :]
                 centered = self.recenter_at_mean(subsample)
@@ -149,16 +164,16 @@ class SchurTransform:
         order: int=None,
     ):
         symmetric_group = SymmetricGroupUtilities(order=order)
-        conjugacy_classes = symmetric_group.compute_conjugacy_classes()
+        conjugacy_classes = symmetric_group.get_conjugacy_classes()
         aggregated_permutation_operators = {
-            cycle_type : TensorOperator(
+            partition_string : TensorOperator(
                 number_of_factors=order,
                 dimension=dimension,
-            ) for cycle_type in conjugacy_classes.keys()
+            ) for partition_string in conjugacy_classes.keys()
         }
-        for cycle_type, conjugacy_class in conjugacy_classes.items():
+        for partition_string, conjugacy_class in conjugacy_classes.items():
             for permutation in conjugacy_class:
-                aggregated_permutation_operators[cycle_type].add(
+                aggregated_permutation_operators[partition_string].add(
                     TensorOperator(
                         number_of_factors=order,
                         dimension=dimension,
@@ -167,18 +182,19 @@ class SchurTransform:
                     inplace=True
                 )
         projectors = {
-            i : TensorOperator(
+            key : TensorOperator(
                 number_of_factors=order,
                 dimension=dimension,
-            ) for i in range(len(symmetric_group.characters))
+            ) for key in symmetric_group.get_characters().keys()
         }
-        for i, character in enumerate(symmetric_group.characters):
-            for cycle_type, aggregated_permutation_operator in aggregated_permutation_operators.items():
-                projectors[i].add(
-                    aggregated_permutation_operator.scale_by(amount=character[cycle_type]),
+        for key, character in symmetric_group.get_characters().items():
+            for partition_string, aggregated_permutation_operator in aggregated_permutation_operators.items():
+                projectors[key].add(
+                    aggregated_permutation_operator.scale_by(amount=character[partition_string]),
                     inplace=True,
                 )
-            projectors[i].scale_by(amount=character['()'] / factorial(order), inplace=True)
+            character_dimension = character[symmetric_group.get_identity_partition_string()]
+            projectors[key].scale_by(amount=character_dimension / factorial(order), inplace=True)
         if not self.validate_projectors(projectors, symmetric_group):
             return None
         return projectors
@@ -247,7 +263,6 @@ class SchurTransform:
         decomposition = {}
         for i, projector in projectors.items():
             component = projector.apply(tensor)
-            # component.scale_by(amount=1.0/factorial(order), inplace=True)
             decomposition[i] = component
         return decomposition
 

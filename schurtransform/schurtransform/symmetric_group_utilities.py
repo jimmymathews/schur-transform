@@ -1,6 +1,8 @@
 import itertools
 import importlib
 import importlib.resources
+import functools
+from functools import lru_cache
 import re
 
 import pandas as pd
@@ -34,23 +36,40 @@ class SymmetricGroupUtilities:
         """  
         self.order = order
         if self.order < 2:
-            logger.error('Need order > 1, got %s', order)
+            logger.error('Need order > 1, got %s.', order)
             return
-        if self.order > 6:
-            logger.error('Regeneration not supported yet (only orders up to 6 are distributed with the library).')
+        if self.order > 8:
+            logger.error('Regeneration not supported yet (only orders up to 8 are distributed with the library; see "generate_characters.sh").')
             return
 
         with importlib.resources.path(character_tables, 's' + str(order) + '.csv') as path:
-            df = pd.read_csv(path, header=None)
-        self.characters = []
-        self.conjugacy_class_representatives = list(df.iloc[1])
-        keys = self.conjugacy_class_representatives
-        conjugacy_class_sizes = list(df.iloc[0])
-        self.conjugacy_class_sizes = {keys[i]:int(conjugacy_class_sizes[i]) for i in range(len(keys))}
-        for i, row in df.iterrows():
-            if i < 2:
-                continue
-            self.characters.append({keys[i]:int(row[i]) for i in range(len(row))})
+            character_table = pd.read_csv(path, index_col=0)
+
+        with importlib.resources.path(character_tables, 'symmetric_group_conjugacy_classes.csv') as path:
+            conjugacy_classes = pd.read_csv(path, index=False)
+
+        conjugacy_classes = conjugacy_classes[conjugacy_classes['Symmetric group'] == 'S' + str(self.order)]
+        self.conjugacy_class_sizes = {}
+        for i, row in conjugacy_classes.iterrows():
+            self.conjugacy_class_sizes[row['Partition']] = row['Class size']
+
+        self.conjugacy_class_representatives = [str(entry) for entry in list(conjugacy_classes['Partition'])]
+
+        self.characters = {}
+        for index, row in df.iterrows():
+            self.characters[index] = {
+                key : row[key] for key in row.keys()
+            }
+
+        # self.conjugacy_class_representatives = list(df.iloc[1])
+        # keys = self.conjugacy_class_representatives
+        # conjugacy_class_sizes = list(df.iloc[0])
+
+        # self.conjugacy_class_sizes = {keys[i]:int(conjugacy_class_sizes[i]) for i in range(len(keys))}
+        # for i, row in df.iterrows():
+        #     if i < 2:
+        #         continue
+        #     self.characters.append({keys[i]:int(row[i]) for i in range(len(row))})
 
     @staticmethod
     def partition_from_cycle_type(
@@ -111,35 +130,42 @@ class SymmetricGroupUtilities:
                 del by_index[entry]
         return tuple(sorted([len(cycle) for cycle in cycles]))
 
-    def compute_conjugacy_classes(self):
+    def get_identity_partition_string(self):
+        return '+'.join([1]*self.order)
+
+    def get_characters(self):
+        return self.characters
+
+    @lru_cache(maxsize=1)
+    def get_conjugacy_classes(self):
         """
         Returns:
             dict:
-                Keys are the cycle type strings (as given in the character tables), and
-                values are the permutations in the indicated conjugacy class. The format
-                of the permutations is a sequence of positive integer function values.
+                Keys are the integer partition strings (as given in the character
+                tables), and values are the permutations in the indicated conjugacy
+                class. The format of the permutations is a sequence of positive integer
+                function values.
         """
-        cycle_types = self.conjugacy_class_representatives
-        permutations_by_cycle_type = {
-            cycle_type : [] for cycle_type in cycle_types
+        partition_strings = self.conjugacy_class_representatives
+        partition_strings_by_partition = {
+            sorted([
+                int(entry) for entry in partition_string.split('+')
+            ], ascending=False) : partition_string for partitiong_string in partition_strings
         }
-        cycle_types_by_partition = {
-            self.partition_from_cycle_type(
-                cycle_type=cycle_type,
-                partitioned_integer = self.order,
-            ) : cycle_type for cycle_type in cycle_types
+        permutations_by_partition_string = {
+            partition_string : [] for partition_string in partition_strings
         }
         permutations = list(itertools.permutations([i+1 for i in range(self.order)]))
         for permutation in permutations:
             partition = self.partition_from_permutation(permutation)
-            cycle_type = cycle_types_by_partition[partition]
-            permutations_by_cycle_type[cycle_type].append(permutation)
+            partition_string = partition_strings_by_partition[partition]
+            permutations_by_partition_string[partition_string].append(permutation)
 
-        for cycle_type, conjugacy_class in permutations_by_cycle_type.items():
-            if len(conjugacy_class) != self.conjugacy_class_sizes[cycle_type]:
+        for partition_string, conjugacy_class in permutations_by_partition_string.items():
+            if len(conjugacy_class) != self.conjugacy_class_sizes[partition_string]:
                 logger.error("Found %s permutations of certain class, expected %s.",
                     len(conjugacy_class),
                     self.conjugacy_class_sizes[cycle_type],
                 )
 
-        return {key : sorted(value) for key, value in permutations_by_cycle_type.items()}
+        return {key : sorted(value) for key, value in permutations_by_partition_string.items()}
