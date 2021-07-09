@@ -82,19 +82,14 @@ class TensorOperator:
                 str(self.dimension),
             )
             return
+        join_range_left = [i + self.number_of_factors for i in range(self.number_of_factors)]
+        join_range_right = [i for i in range(self.number_of_factors)]
+        output_data = np.tensordot(self.data, input_tensor.data, axes=(join_range_left, join_range_right))
         output_tensor = Tensor(
             number_of_factors=self.number_of_factors,
             dimension=self.dimension,
         )
-        iterator_output = output_tensor.get_entry_iterator()
-        for output_entry in iterator_output:
-            I = iterator_output.multi_index
-            iterator_input = input_tensor.get_entry_iterator()
-            accumulator = 0
-            for input_entry in iterator_input:
-                J = iterator_input.multi_index
-                accumulator += self.data[I + J] * iterator_input[0]
-            iterator_output[0] = accumulator
+        output_tensor.data = output_data
         return output_tensor
 
     def add(self,
