@@ -15,6 +15,7 @@ The following shows example usage:
 
 ```python
 import schurtransform as st
+
 samples = [
     [[4,2], [4.01,2.1], [3.9,2.2]],
     [[3.99,2.1], [3.7,2.1] ,[4.0,2.2]],
@@ -24,21 +25,25 @@ samples = [
 decomposition = st.transform(
     samples=samples,
 )
+print(list(decomposition.keys()))
+print(decomposition['3+1'].data)
 
-decomposition['3+1'].data
-
->>  array([[[[ 0.00000000e+00,  4.44722222e-05],
->>           [ 3.48055556e-05, -3.82222222e-05]],
->>
->>          [[ 2.09166667e-05,  6.05555556e-05],
->>           [ 1.22222222e-05, -4.38888889e-05]]],
->>
->>
->>         [[[-1.00194444e-04, -1.22222222e-05],
->>           [-6.05555556e-05, -6.83333333e-05]],
->>
->>          [[ 3.82222222e-05,  5.61111111e-05],
->>           [ 5.61111111e-05,  0.00000000e+00]]]])
+# Output:
+#
+#    ['1+1+1+1', '2+1+1', '2+2', '3+1', '4']
+#
+#    [[[[ 0.00000000e+00  4.44722222e-05]
+#       [ 3.48055556e-05 -3.82222222e-05]]
+#
+#      [[ 2.09166667e-05  6.05555556e-05]
+#       [ 1.22222222e-05 -4.38888889e-05]]]
+#
+#
+#     [[[-1.00194444e-04 -1.22222222e-05]
+#       [-6.05555556e-05 -6.83333333e-05]]
+#
+#      [[ 3.82222222e-05  5.61111111e-05]
+#       [ 5.61111111e-05  0.00000000e+00]]]]
 ```
 
 The `components` are the GL(k)- or Sn-isotypic components of the covariance tensor of `v` in the tensor space with `n` tensor factors and `k` dimensions for each factor. Each one is presented as a multi-dimensional numpy array with `n` indices ranging across `k` values.

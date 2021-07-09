@@ -25,7 +25,7 @@ setuptools.setup(
     ],
     package_data={
         'schurtransform': ['VERSION'],
-        'schurtransform.character_tables' : ['s2.csv', 's3.csv', 's4.csv', 's5.csv', 's6.csv', 's7.csv', 's8.csv'],
+        'schurtransform.character_tables' : ['s2.csv', 's3.csv', 's4.csv', 's5.csv', 's6.csv', 's7.csv', 's8.csv', 'symmetric_group_conjugacy_classes.csv'],
     },
     classifiers=[
         'Programming Language :: Python :: 3',
