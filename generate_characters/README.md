@@ -1,6 +1,6 @@
 # Using GAP to calculate symmetric group characters
 
-Character tables are computed with [GAP](https://www.gap-system.org/) (the Graphs, Algorithms, and Programming computer algebra system). We used GAP version 4.11.1.
+Character tables are computed with [GAP](https://www.gap-system.org/) (the Groups, Algorithms, and Programming computer algebra system). We used GAP version 4.11.1.
 
 You can install GAP on your computer by following the [installation instructions](https://www.gap-system.org/Download/index.html). Ensure `gap` is on the path, or else modify `generate_characters.sh` accordingly.
 
