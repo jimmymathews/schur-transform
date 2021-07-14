@@ -1,9 +1,15 @@
 import importlib.resources
 
-from .transform import SchurTransform
-# from . import lung_data
+from .schur_transform import SchurTransform
+from . import lung_data
 
 global_transformer = SchurTransform()
+
+with importlib.resources.path(package=lung_data, resource='examples_manifest.txt') as path:
+    example_filenames = open(path).read().split('\n')
+
+with importlib.resources.path(package=lung_data, resource=example_filenames[0]) as path:
+    txt = open(path).read()
 
 def transform(samples, **kwargs):
     """
@@ -11,15 +17,8 @@ def transform(samples, **kwargs):
     """
     return global_transformer.transform(samples, **kwargs)
 
+def get_example_filenames():
+    return example_filenames
 
-# with importlib.resources.path(lung_data, 'examples_manifest.txt') as path:
-#     example_filenames = open(path).read().split('\n')
-
-# with importlib.resources.path(lung_data, example_filenames[0]) as path:
-#     txt = open(path).read()
-
-# def get_example_filenames():
-#     return example_filenames
-
-# def get_example_text():
-#     return txt
+def get_example_text():
+    return txt

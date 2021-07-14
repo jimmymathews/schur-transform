@@ -25,6 +25,7 @@ setuptools.setup(
     packages=[
         'schurtransform',
         'schurtransform.character_tables',
+        'schurtransform.lung_data',
     ],
     package_data={
         'schurtransform': ['VERSION'],
