@@ -62,6 +62,12 @@ class CharacterTableGAPTextParser:
                     domain_labels[j] : characters[i][j] for j in range(len(domain_labels))
                 } for i in range(len(character_labels))
             }
+            for character_label, function in records.items():
+                all_1s = all([value == 1 for domain_label, value in function.items()])
+                if all_1s:
+                    if character_label != '+'.join(['1']*rank):
+                        print('Error: The trivial partition does not match up with the trivial representation in case of rank ' + str(rank) + '.')
+
             df = pd.DataFrame(records).transpose()
             for j in range(len(domain_labels)):
                 conjugacy_class_records.append({
