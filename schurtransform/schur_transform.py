@@ -34,9 +34,14 @@ class SchurTransform:
     ):
         """
         :param samples:
+            "Registered" spatial samples data.
+            
             A multi-dimensional array, or nested list of lists of lists. The axis
-            indices are respectively: the index indicating the series/variable, the
-            sample index, and the spatial coordinate index.
+            indices are respectively:
+
+            - the index indicating the series/variable
+            - the sample index
+            - the spatial coordinate index
         :type samples: multi-dimensional array-like
 
         :param summary:
@@ -89,7 +94,7 @@ class SchurTransform:
 
             If ``summary`` is ``VARIANCE_CONTENT``, the variances of the
             distributions obtained in the ``CONTENT`` case are provided.
-        :rtype: list
+        :rtype: dict
         """
         if type(samples) is list:
             samples = np.array(samples)
@@ -165,7 +170,7 @@ class SchurTransform:
             if summary is DecompositionSummary.VARIANCE_CONTENT:
                 return {i : np.var(content[i]) for i in content.keys()}
 
-    @lru_cache(maxsize=1)
+    @lru_cache(maxsize=5)
     def recalculate_projectors(self,
         dimension: int=None,
         degree: int=None,
@@ -174,6 +179,7 @@ class SchurTransform:
         :param dimension:
             The dimension of the base vector space.
         :type dimension: int
+
         :param degree:
             The number of factors in the tensor product.
         :type degree: int
@@ -229,10 +235,11 @@ class SchurTransform:
             The projectors onto isotypic components, as returned by
             :py:meth:`recalculate_projectors`.
         :type projectors: list
+
         :param character_table:
             The wrapper object around the character table for the symmetric group
             pertaining to the tensor product space which is the projectors' domain.
-        :type character_table: CharacterTable, required
+        :type character_table: CharacterTable
 
         :return:
             True if projectors sum to identity (within an error tolerance), else False.
@@ -261,15 +268,25 @@ class SchurTransform:
             logger.debug('Projectors sum to identity.')
             return True
 
-    def recenter_at_mean(self, samples):
+    def recenter_at_mean(self,
+        samples,
+    ):
         """
-        Args:
-            samples (np.array):
-                "Registered" spatial samples data.
+        :param samples:
+            "Registered" spatial samples data.
+            
+            A multi-dimensional array, or nested list of lists of lists. The axis
+            indices are respectively:
 
-        Returns:
-            Same as samples, except that a translation is applied to each variable which
-            results in the new variable having mean vector equal to 0.
+            - the index indicating the series/variable
+            - the sample index
+            - the spatial coordinate index
+        :type samples: multi-dimensional array-like
+        
+        :return:
+            Same as ``samples``, except that a translation is applied to each spatial
+            variable which results in the new variable having mean vector equal to 0.
+        :rtype: numpy.array
         """
         degree = samples.shape[0]
         number_of_samples = samples.shape[1]
@@ -285,14 +302,14 @@ class SchurTransform:
 
     def calculate_covariance_tensor(self, samples):
         """
-        Args:
-            samples (np.array):
-                "Registered" spatial samples data, typically with mean 0 for each
-                spatial variable.
+        :param samples:
+            "Registered" spatial samples data, typically (but not necessarily) with mean
+            0 for each spatial variable.
+        :type samples: np.array
 
-        Returns:
-            Tensor:
-                The joint moment of the spatial variables.
+        :return:
+            The joint moment of the spatial variables.
+        :rtype: Tensor
         """
         degree = samples.shape[0]
         number_of_samples = samples.shape[1]
@@ -313,19 +330,24 @@ class SchurTransform:
             logger.warning('Covariance tensor is identically 0.')
         return covariance_tensor
 
-    def calculate_decomposition(self, tensor, projectors):
+    def calculate_decomposition(self,
+        tensor,
+        projectors,
+    ):
         """
-        Args:
-            tensor (Tensor):
-                Input tensor to be decomposed.
-            projectors (dict):
-                Projector operators onto isotypic components, as returned by
-                ``recalculate_projectors``.
+        :param tensor:
+            Input tensor to be decomposed.
+        :type tensor: Tensor
 
-        Returns:
-            dict:
-                Keys are the integer partition strings labelling isotypic components,
-                values are the components of the input tensor in the given component.
+        :param projectors:
+            Projector operators onto isotypic components, as returned by
+            :py:meth:`recalculate_projectors`.
+        :type projectors: dict
+
+        :return:
+            Keys are the integer partition strings labelling isotypic components, values
+            are the components of the input tensor, as :py:class:`.tensor.Tensor` objects.
+        :rtype: dict
         """
         degree = len(tensor.data.shape)
         decomposition = {}
@@ -336,17 +358,19 @@ class SchurTransform:
 
     def validate_decomposition(self, decomposition, tensor):
         """
-        Args:
-            decomposition (dict):
-                Additive Schur-Weyl decomposition, as returned e.g. by
-                ``calculate_decomposition``.
-            tensor (Tensor):
-                A given tensor.
+        :param decomposition:
+            Additive Schur-Weyl decomposition, as returned e.g. by
+            :py:meth:`calculate_decomposition`.
+        :type decomposition: dict
 
-        Returns:
-            bool:
-                True if the sum of the components of the decomposition equals to the
-                supplied tensor (within an error tolerance).
+        :param tensor:
+                A given tensor.
+        :type tensor: Tensor
+
+        :return:
+            True if the sum of the components of the decomposition equals to the
+            supplied tensor (within an error tolerance).
+        :rtype: bool
         """
         degree = len(tensor.data.shape)
         dimension = tensor.data.shape[0]
