@@ -1,4 +1,3 @@
-import importlib
 import importlib.resources
 
 from .transform import SchurTransform

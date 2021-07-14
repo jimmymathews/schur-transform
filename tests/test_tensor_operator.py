@@ -1,6 +1,6 @@
 import numpy as np
 import random
-import itertools
+from itertools import combinations
 
 import schurtransform
 from schurtransform.tensor import Tensor
@@ -89,7 +89,7 @@ def test_additivity_over_input_tensor():
         writer[0] = random.random()
 
     for j in range(5):
-        combos = itertools.combinations(random_tensors, j)
+        combos = combinations(random_tensors, j)
         for combo in combos:
             sum1 = Tensor(number_of_factors=4, dimension=2)
             for tensor in combo:
@@ -119,7 +119,7 @@ def test_additivity_over_operator():
         writer[0] = random.random()
 
     for j in range(5):
-        combos = itertools.combinations(random_operators, j)
+        combos = combinations(random_operators, j)
         for combo in combos:
             sum1 = TensorOperator(number_of_factors=4, dimension=2)
             for operator in combo:
@@ -132,7 +132,3 @@ def test_additivity_over_operator():
             result2 = sum2
 
             assert(np.linalg.norm(result1.data - result2.data) < tolerance)
-
-
-
-

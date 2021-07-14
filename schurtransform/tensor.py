@@ -32,8 +32,7 @@ class Tensor:
         values with ``it = new_value``.
 
         Returns:
-            iterable:
-                The iterator.
+            The iterator.
         """
         return np.nditer(self.data, flags = ['multi_index'], op_flags=['readwrite'])
 

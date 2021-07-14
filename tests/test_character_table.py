@@ -1,19 +1,18 @@
-import math
 from math import factorial
 
 import schurtransform
 from schurtransform.character_table import CharacterTable
 
 def test_init():
-    for order in [2,3,4,5,6]:
-        u = CharacterTable(order=order)
-        N = len(u.characters)
-        for character in u.characters.values():
+    for rank in [2,3,4,5,6]:
+        table = CharacterTable(rank=rank)
+        N = len(table.characters)
+        for character in table.characters.values():
             assert(N == len(character))
-        domain = u.conjugacy_class_representatives
-        sizes = u.conjugacy_class_sizes
-        for character1 in u.characters.values():
-            for character2 in u.characters.values():
+        domain = table.conjugacy_class_representatives
+        sizes = table.conjugacy_class_sizes
+        for character1 in table.characters.values():
+            for character2 in table.characters.values():
                 product = sum([character1[key] * character2[key] * sizes[key] for key in domain])
                 print(character1)
                 print(character2)
@@ -23,7 +22,7 @@ def test_init():
                 if character1 != character2:
                     assert(product == 0)
                 else:
-                    assert(product == factorial(order))
+                    assert(product == factorial(rank))
 
 def test_partitioning_permutation():
     p = CharacterTable.partition_from_permutation(
@@ -32,8 +31,8 @@ def test_partitioning_permutation():
     assert(p == (1, 1, 1, 1, 1, 2, 3))
 
 def test_build_conjugacy_classes():
-    u = CharacterTable(order=3)
-    conjugacy_classes = u.get_conjugacy_classes()
+    table = CharacterTable(rank=3)
+    conjugacy_classes = table.get_conjugacy_classes()
     assert(conjugacy_classes == {
         '1+1+1' : [(1, 2, 3)],
         '2+1' : [(1, 3, 2), (2, 1, 3), (3, 2, 1)],

@@ -1,12 +1,6 @@
-import enum
 from enum import Enum, auto
-import os
-from os.path import join
-import functools
 from functools import lru_cache
-import itertools
 from itertools import combinations
-import math
 from math import factorial
 
 import numpy as np
@@ -39,8 +33,8 @@ class SchurTransform:
         Args:
             samples (multi dimensional array-like):
                 A multi-dimensional array, or nested list of lists of lists. The axis
-                indices are respectively: the index indicating the series, the sample
-                index, and the spatial coordinate index.
+                indices are respectively: the index indicating the series/variable,
+                the sample index, and the spatial coordinate index.
             summary_type (str):
                 See the enum class ``SummaryType``, and the cases for return value.
             number_of_factors (int):
@@ -61,23 +55,28 @@ class SchurTransform:
 
         Returns:
             array-like:
-                If ``summary_type`` is COMPONENTS, returns the tensor components of the
-                Schur-Weyl decomposition of the joint moment tensor, the tensor product
-                over the series index.
-                If ``summary_type`` is NORMS, returns the Euclidean norms of the tensor
-                components of the Schur-Weyl decomposition.
-                If ``summary_type`` is CONTENT, returns a list of distributions, one for
-                each tensor component type, consisting of the Euclidean norms of that
-                component of the decomposition of all N-factor joint moments, where N is
-                the given ``number_of_factors``.
-                If ``summary_type`` is SEQUENTIAL_CONTENT, returns a list of
+                If ``summary_type`` is "COMPONENTS", returns the tensor components of
+                the Schur-Weyl decomposition of the joint moment tensor, the tensor
+                product over the series index.
+
+                If ``summary_type`` is "NORMS", returns the Euclidean norms of the
+                tensor components of the Schur-Weyl decomposition.
+
+                If ``summary_type`` is "CONTENT", returns a list of distributions, one
+                for each tensor component type, consisting of the Euclidean norms of
+                that component of the decomposition of all N-factor joint moments,
+                where N is the given ``number_of_factors``.
+
+                If ``summary_type`` is "SEQUENTIAL_CONTENT", returns a list of
                 distributions just as in the CONTENT case, except that only consecutive
                 N-fold products are considered.
-                If ``summary_type`` is MEAN_CONTENT, the means of the distributions
-                obtained in the CONTENT case are provided (one for each tensor component
-                type).
-                If ``summary_type`` is VARIANCE_CONTENT, the variances of the
-                distributions obtained in the CONTENT case are provided.
+
+                If ``summary_type`` is "MEAN_CONTENT", the means of the distributions
+                obtained in the "CONTENT" case are provided (one for each tensor
+                component type).
+
+                If ``summary_type`` is "VARIANCE_CONTENT", the variances of the
+                distributions obtained in the "CONTENT" case are provided.
         """
         if type(samples) is list:
             samples = np.array(samples)
@@ -87,14 +86,12 @@ class SchurTransform:
             return
 
         number_of_series = samples.shape[0]
-        number_of_samples= samples.shape[1]
         dimension = samples.shape[2]
-
         summary_type = SummaryType[summary_type]
         if summary_type in [SummaryType.COMPONENTS, SummaryType.NORMS]:
-            order = number_of_series
+            rank = number_of_series
         else:
-            order = number_of_factors
+            rank = number_of_factors
             if number_of_factors is None:
                 logger.error(
                     'For summary_type=%s you must supply a number of tensor factors.',
@@ -103,16 +100,14 @@ class SchurTransform:
                 return
 
         logger.debug(
-            'Calculating projectors of type order=%s and dimension=%s.',
-            order,
+            'Calculating projectors of type rank=%s and dimension=%s.',
+            rank,
             dimension,
         )
         projectors = self.recalculate_projectors(
-            number_of_samples=number_of_samples,
             dimension=dimension,
-            order=order,
+            rank=rank,
         )
-
         if summary_type in [SummaryType.COMPONENTS, SummaryType.NORMS]:
             centered = self.recenter_at_mean(samples)
             covariance_tensor = self.calculate_covariance_tensor(centered)
@@ -132,12 +127,12 @@ class SchurTransform:
             SummaryType.VARIANCE_CONTENT,
         ]:
             if summary_type == SummaryType.SEQUENTIAL_CONTENT:
-                index_combinations = [[i + j for j in range(order)] for i in range(number_of_series-(order-1))]
+                index_combinations = [[i + j for j in range(rank)] for i in range(number_of_series-(rank-1))]
             else:
-                index_combinations = combinations(list(range(number_of_series)), order)
+                index_combinations = combinations(list(range(number_of_series)), rank)
 
-            symmetric_group = CharacterTable(order=order)
-            content = {key : [] for key in symmetric_group.get_characters().keys()}
+            character_table = CharacterTable(rank=rank)
+            content = {key : [] for key in character_table.get_characters().keys()}
             for combination in index_combinations:
                 subsample = samples[list(combination), :, :]
                 centered = self.recenter_at_mean(subsample)
@@ -159,15 +154,26 @@ class SchurTransform:
 
     @lru_cache(maxsize=1)
     def recalculate_projectors(self,
-        number_of_samples: int=None,
         dimension: int=None,
-        order: int=None,
+        rank: int=None,
     ):
-        symmetric_group = CharacterTable(order=order)
-        conjugacy_classes = symmetric_group.get_conjugacy_classes()
+        """
+        Args:                
+            dimension (int):
+                The dimension of the base vector space.
+            rank (int):
+                The number of factors in the tensor product.
+
+        Returns:
+            dict:
+                Keys are the integer partition strings, values are the TensorOperator
+                objects of the corresponding Young projectors.
+        """
+        character_table = CharacterTable(rank=rank)
+        conjugacy_classes = character_table.get_conjugacy_classes()
         aggregated_permutation_operators = {
             partition_string : TensorOperator(
-                number_of_factors=order,
+                number_of_factors=rank,
                 dimension=dimension,
             ) for partition_string in conjugacy_classes.keys()
         }
@@ -175,7 +181,7 @@ class SchurTransform:
             for permutation in conjugacy_class:
                 aggregated_permutation_operators[partition_string].add(
                     TensorOperator(
-                        number_of_factors=order,
+                        number_of_factors=rank,
                         dimension=dimension,
                         permutation_inverse=permutation,
                     ),
@@ -183,39 +189,54 @@ class SchurTransform:
                 )
         projectors = {
             key : TensorOperator(
-                number_of_factors=order,
+                number_of_factors=rank,
                 dimension=dimension,
-            ) for key in symmetric_group.get_characters().keys()
+            ) for key in character_table.get_characters().keys()
         }
-        for key, character in symmetric_group.get_characters().items():
+        for key, character in character_table.get_characters().items():
             for partition_string, aggregated_permutation_operator in aggregated_permutation_operators.items():
                 projectors[key].add(
                     aggregated_permutation_operator.scale_by(amount=character[partition_string]),
                     inplace=True,
                 )
-            character_dimension = character[symmetric_group.get_identity_partition_string()]
-            projectors[key].scale_by(amount=character_dimension / factorial(order), inplace=True)
-        if not self.validate_projectors(projectors, symmetric_group):
+            character_dimension = character[character_table.get_identity_partition_string()]
+            projectors[key].scale_by(amount=character_dimension / factorial(rank), inplace=True)
+        if not self.validate_projectors(projectors, character_table):
             return None
         return projectors
 
-    def validate_projectors(self, projectors, symmetric_group):
-        identity = symmetric_group.get_identity_partition_string()
-        order = int(len(projectors[identity].data.shape) / 2)
+    def validate_projectors(self,
+        projectors: dict=None,
+        character_table: CharacterTable=None,
+    ):
+        """
+        Args:
+            projectors (dict):
+                The projectors onto isotypic components, as returned by
+                ``recalculate_projectors``.
+            character_table (CharacterTable):
+                The wrapper object around the character table for the symmetric group
+                pertaining to the tensor product space which is the projectors' domain.
+
+        Returns:
+            bool:
+                True if projectors sum to identity (within an error tolerance), else
+                False.
+        """
+        identity = character_table.get_identity_partition_string()
+        rank = int(len(projectors[identity].data.shape) / 2)
         dimension = projectors[identity].data.shape[2]
         accumulator = TensorOperator(
-            number_of_factors=order,
+            number_of_factors=rank,
             dimension=dimension,
         )
         for projector in projectors.values():
             accumulator.add(projector, inplace=True)
-
         identity_scaled = TensorOperator(
-            number_of_factors=order,
+            number_of_factors=rank,
             dimension = dimension,
             identity = True,
         )
-
         tolerance = np.linalg.norm(accumulator.data) / pow(10, 9)
         if not np.linalg.norm(accumulator.data - identity_scaled.data) < tolerance:
             logger.error('Projectors do not sum to identity.')
@@ -226,13 +247,21 @@ class SchurTransform:
             return True
 
     def recenter_at_mean(self, samples):
-        order = samples.shape[0]
+        """
+        Args:
+            samples (np.array):
+                "Registered" spatial samples data.
+
+        Returns:
+            Same as samples, except that a translation is applied to each variable which
+            results in the new variable having mean vector equal to 0.
+        """
+        rank = samples.shape[0]
         number_of_samples = samples.shape[1]
         dimension = samples.shape[2]
-        means = np.array([[np.mean(samples[i,:,a]) for a in range(dimension)] for i in range(order)])
-
+        means = np.array([[np.mean(samples[i,:,a]) for a in range(dimension)] for i in range(rank)])
         recentered = np.zeros(samples.shape)
-        for i in range(order):
+        for i in range(rank):
             for a in range(dimension):
                 m = means[i,a]
                 for j in range(number_of_samples):
@@ -240,11 +269,21 @@ class SchurTransform:
         return recentered
 
     def calculate_covariance_tensor(self, samples):
-        order = samples.shape[0]
+        """
+        Args:
+            samples (np.array):
+                "Registered" spatial samples data, typically with mean 0 for each
+                spatial variable.
+
+        Returns:
+            Tensor:
+                The joint moment of the spatial variables.
+        """
+        rank = samples.shape[0]
         number_of_samples = samples.shape[1]
         dimension = samples.shape[2]
         covariance_tensor = Tensor(
-            number_of_factors=order,
+            number_of_factors=rank,
             dimension=dimension,
         )
         it = covariance_tensor.get_entry_iterator()
@@ -252,7 +291,7 @@ class SchurTransform:
             M = it.multi_index
             it[0] = np.sum([
                 np.prod([
-                    samples[i, j, M[i]] for i in range(order)
+                    samples[i, j, M[i]] for i in range(rank)
                 ]) for j in range(number_of_samples)
             ])
         if (covariance_tensor.data == 0).all():
@@ -260,7 +299,20 @@ class SchurTransform:
         return covariance_tensor
 
     def calculate_decomposition(self, tensor, projectors):
-        order = len(tensor.data.shape)
+        """
+        Args:
+            tensor (Tensor):
+                Input tensor to be decomposed.
+            projectors (dict):
+                Projector operators onto isotypic components, as returned by
+                ``recalculate_projectors``.
+
+        Returns:
+            dict:
+                Keys are the integer partition strings labelling isotypic components,
+                values are the components of the input tensor in the given component.
+        """
+        rank = len(tensor.data.shape)
         decomposition = {}
         for partition_string, projector in projectors.items():
             component = projector.apply(tensor)
@@ -268,10 +320,23 @@ class SchurTransform:
         return decomposition
 
     def validate_decomposition(self, decomposition, tensor):
-        order = len(tensor.data.shape)
+        """
+        Args:
+            decomposition (dict):
+                Additive Schur-Weyl decomposition, as returned e.g. by
+                ``calculate_decomposition``.
+            tensor (Tensor):
+                A given tensor.
+
+        Returns:
+            bool:
+                True if the sum of the components of the decomposition equals to the
+                supplied tensor (within an error tolerance).
+        """
+        rank = len(tensor.data.shape)
         dimension = tensor.data.shape[0]
         resummed = Tensor(
-            number_of_factors = order,
+            number_of_factors = rank,
             dimension = dimension,
         )
         for i, component in decomposition.items():

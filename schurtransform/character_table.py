@@ -1,7 +1,5 @@
 import itertools
-import importlib
 import importlib.resources
-import functools
 from functools import lru_cache
 import re
 
@@ -17,38 +15,38 @@ class CharacterTable:
     Wrapper over a GAP-provided symmetric group character table.
     """
     def __init__(self,
-        order: int=None,
+        rank: int=None,
     ):
         """
         Attributes:
             conjugacy_class_representatives (list):
-                Strings in cycle notation indicating conjugacy classes in the symmetric
-                group.
+                Strings in integer partition "+" notation indicating conjugacy classes
+                in the symmetric group.
             conjugacy_class_sizes (dict):
                 The sizes of each conjugacy class.
             characters (list):
                 A list of dictionaries, each dictionary being the class function
-                represented by one character of the symmetric group of order ``order``.
+                represented by one character of the symmetric group of rank ``rank``.
 
         Args:
-            order (int):
-                The order of the symmetric group to be considered.
+            rank (int):
+                The rank of the symmetric group to be considered.
         """  
-        self.order = order
-        if self.order < 2:
-            logger.error('Need order > 1, got %s.', order)
+        self.rank = rank
+        if self.rank < 2:
+            logger.error('Need rank > 1, got %s.', rank)
             return
-        if self.order > 8:
-            logger.error('Regeneration not supported yet (only orders up to 8 are distributed with the library; see "generate_characters.sh").')
+        if self.rank > 8:
+            logger.error('Regeneration not supported yet (only ranks up to 8 are distributed with the library; see "generate_characters.sh").')
             return
 
-        with importlib.resources.path(character_tables, 's' + str(order) + '.csv') as path:
+        with importlib.resources.path(character_tables, 's' + str(rank) + '.csv') as path:
             character_table = pd.read_csv(path, index_col=0)
 
         with importlib.resources.path(character_tables, 'symmetric_group_conjugacy_classes.csv') as path:
             conjugacy_classes = pd.read_csv(path, index_col=False)
 
-        conjugacy_classes = conjugacy_classes[conjugacy_classes['Symmetric group'] == 'S' + str(self.order)]
+        conjugacy_classes = conjugacy_classes[conjugacy_classes['Symmetric group'] == 'S' + str(self.rank)]
         self.conjugacy_class_sizes = {}
         for i, row in conjugacy_classes.iterrows():
             self.conjugacy_class_sizes[row['Partition']] = row['Conjugacy class size']
@@ -90,7 +88,7 @@ class CharacterTable:
         return tuple(sorted([len(cycle) for cycle in cycles]))
 
     def get_identity_partition_string(self):
-        return '+'.join(['1']*self.order)
+        return '+'.join(['1'] * self.rank)
 
     def get_characters(self):
         return self.characters
@@ -114,7 +112,7 @@ class CharacterTable:
         permutations_by_partition_string = {
             partition_string : [] for partition_string in partition_strings
         }
-        permutations = list(itertools.permutations([i+1 for i in range(self.order)]))
+        permutations = list(itertools.permutations([i+1 for i in range(self.rank)]))
         for permutation in permutations:
             partition = self.partition_from_permutation(permutation)
             partition_string = partition_strings_by_partition[partition]
