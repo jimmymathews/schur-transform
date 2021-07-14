@@ -1,7 +1,7 @@
 import numpy as np
 
 import schurtransform as st
-from schurtransform.transform import SchurTransform
+from schurtransform.schur_transform import SchurTransform
 
 def test_transform_norms():
     samples = [
@@ -39,10 +39,10 @@ def test_decomposition_recomposition():
     number_of_series = samples.shape[0]
     dimension = samples.shape[2]
 
-    rank = number_of_series
+    degree = number_of_series
     projectors = t.recalculate_projectors(
         dimension=dimension,
-        rank=rank,
+        degree=degree,
     )
 
     centered = t.recenter_at_mean(samples)
@@ -61,7 +61,7 @@ def test_content():
     ]
     content = st.transform(
         samples=samples,
-        summary_type='CONTENT',
+        summary='CONTENT',
     )
 
 

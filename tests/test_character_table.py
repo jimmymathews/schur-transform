@@ -4,8 +4,8 @@ import schurtransform
 from schurtransform.character_table import CharacterTable
 
 def test_init():
-    for rank in [2,3,4,5,6]:
-        table = CharacterTable(rank=rank)
+    for degree in [2,3,4,5,6]:
+        table = CharacterTable(degree=degree)
         N = len(table.characters)
         for character in table.characters.values():
             assert(N == len(character))
@@ -22,7 +22,7 @@ def test_init():
                 if character1 != character2:
                     assert(product == 0)
                 else:
-                    assert(product == factorial(rank))
+                    assert(product == factorial(degree))
 
 def test_partitioning_permutation():
     p = CharacterTable.partition_from_permutation(
@@ -31,7 +31,7 @@ def test_partitioning_permutation():
     assert(p == (1, 1, 1, 1, 1, 2, 3))
 
 def test_build_conjugacy_classes():
-    table = CharacterTable(rank=3)
+    table = CharacterTable(degree=3)
     conjugacy_classes = table.get_conjugacy_classes()
     assert(conjugacy_classes == {
         '1+1+1' : [(1, 2, 3)],

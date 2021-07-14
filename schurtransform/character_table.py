@@ -15,7 +15,7 @@ class CharacterTable:
     Wrapper over a GAP-provided symmetric group character table.
     """
     def __init__(self,
-        rank: int=None,
+        degree: int=None,
     ):
         """
         Attributes:
@@ -26,27 +26,27 @@ class CharacterTable:
                 The sizes of each conjugacy class.
             characters (list):
                 A list of dictionaries, each dictionary being the class function
-                represented by one character of the symmetric group of rank ``rank``.
+                represented by one character of the symmetric group of degree ``degree``.
 
         Args:
-            rank (int):
-                The rank of the symmetric group to be considered.
+            degree (int):
+                The degree of the symmetric group to be considered.
         """  
-        self.rank = rank
-        if self.rank < 2:
-            logger.error('Need rank > 1, got %s.', rank)
+        self.degree = degree
+        if self.degree < 2:
+            logger.error('Need degree > 1, got %s.', degree)
             return
-        if self.rank > 8:
-            logger.error('Regeneration not supported yet (only ranks up to 8 are distributed with the library; see "generate_characters.sh").')
+        if self.degree > 8:
+            logger.error('Regeneration not supported yet (only degrees up to 8 are distributed with the library; see "generate_characters.sh").')
             return
 
-        with importlib.resources.path(character_tables, 's' + str(rank) + '.csv') as path:
+        with importlib.resources.path(character_tables, 's' + str(degree) + '.csv') as path:
             character_table = pd.read_csv(path, index_col=0)
 
         with importlib.resources.path(character_tables, 'symmetric_group_conjugacy_classes.csv') as path:
             conjugacy_classes = pd.read_csv(path, index_col=False)
 
-        conjugacy_classes = conjugacy_classes[conjugacy_classes['Symmetric group'] == 'S' + str(self.rank)]
+        conjugacy_classes = conjugacy_classes[conjugacy_classes['Symmetric group'] == 'S' + str(self.degree)]
         self.conjugacy_class_sizes = {}
         for i, row in conjugacy_classes.iterrows():
             self.conjugacy_class_sizes[row['Partition']] = row['Conjugacy class size']
@@ -88,7 +88,7 @@ class CharacterTable:
         return tuple(sorted([len(cycle) for cycle in cycles]))
 
     def get_identity_partition_string(self):
-        return '+'.join(['1'] * self.rank)
+        return '+'.join(['1'] * self.degree)
 
     def get_characters(self):
         return self.characters
@@ -112,7 +112,7 @@ class CharacterTable:
         permutations_by_partition_string = {
             partition_string : [] for partition_string in partition_strings
         }
-        permutations = list(itertools.permutations([i+1 for i in range(self.rank)]))
+        permutations = list(itertools.permutations([i+1 for i in range(self.degree)]))
         for permutation in permutations:
             partition = self.partition_from_permutation(permutation)
             partition_string = partition_strings_by_partition[partition]
