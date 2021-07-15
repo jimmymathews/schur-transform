@@ -6,7 +6,7 @@ Fourier-Schur analysis is an analogue of Fourier analysis in which the time doma
 
 The transform works by decomposing the generalized covariance tensor of several random variables into canonical components. The "sectors" (irreducible subrepresentations) defining these components in tensor space are defined *a priori* by the condition that they are mutually unreachable from each other by arbitrary change-of-coordinate transformations, as part of a rich theory going back to the work of Issai Schur and Hermann Weyl.
 
-The algorithm used here is described in [*A Schur Transform for Spatial Stochastic Processes*](https://arxiv.org/abs/1811.06221). See also Persi Diaconis' [*Group Representations in Probability and Statistics*](https://www.jstor.org/stable/4355560) for background on the non-abelian Fourier transform in the context of the symmetric group.
+The algorithm used here is described in `A Schur Transform for Spatial Stochastic Processes <https://arxiv.org/abs/1811.06221>`_. See also Persi Diaconis' `Group Representations in Probability and Statistics <https://www.jstor.org/stable/4355560>`_ for background on the non-abelian Fourier transform in the context of the symmetric group.
 
 Getting started
 ---------------
