@@ -1,5 +1,6 @@
 
 from .schur_transform import SchurTransform
+from .examples import get_example_data
 
 global_transformer = SchurTransform()
 
