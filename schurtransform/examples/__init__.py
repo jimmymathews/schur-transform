@@ -7,7 +7,7 @@ from .. import lung_data
 def get_example_data(dataset: str=None):
     """
     :param dataset:
-        Use 'lung 4DCT' for a `dataset<https://www.dir-lab.com>`_ of registered
+        Use 'lung 4DCT' for a `dataset <https://www.dir-lab.com>`_ of registered
         point locations annotated on CT scans of a lung breathing motion. 
     :type dataset: str
 
