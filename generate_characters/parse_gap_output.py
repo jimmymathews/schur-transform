@@ -49,13 +49,14 @@ class CharacterTableGAPTextParser:
             characters = [[int(string) for string in re.findall(r'[\-\d]+', character_string)] for character_string in characters]
             character_labels = re.findall(r'\[ [\-\d \,]+ \]', character_labels)
             character_labels = [[int(string) for string in re.findall(r'[\-\d]+', label)] for label in character_labels]
+            character_labels = [self.transpose_partition(partition) for partition in character_labels]
             character_labels = ['+'.join([str(number) for number in label]) for label in character_labels]
             domain_labels = re.findall(r'\[ [\-\d \,]+ \]', domain_labels)
             domain_labels = [[int(string) for string in re.findall(r'[\-\d]+', label)] for label in domain_labels]
             domain_labels = ['+'.join([str(number) for number in label]) for label in domain_labels]
             class_sizes = [int(match) for match in re.findall(r'\d+', class_sizes)]
-            if character_labels != domain_labels:
-                print('Error: Character labels and domain/conjugacy class labels were not exactly equal in GAP output.')
+            if set(character_labels) != set(domain_labels):
+                print('Error: Character labels and domain/conjugacy class labels in GAP output were not exactly equal sets.')
                 return
             records = {
                 character_labels[i] : {
@@ -81,6 +82,13 @@ class CharacterTableGAPTextParser:
             table.to_csv('s' + str(rank) + '.csv')
 
         conjugacy_classes.to_csv('symmetric_group_conjugacy_classes.csv', index=False)
+
+    def transpose_partition(self, partition):
+        new_parts = [
+            sum([1 for part_size in partition if part_size > i]) for i in range(max(partition)*len(partition))
+        ]
+        new_parts = [part_size for part_size in new_parts if part_size != 0]
+        return sorted(new_parts, reverse=True)
 
 input_filename = sys.argv[1]
 with open(input_filename) as file:
