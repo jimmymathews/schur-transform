@@ -36,12 +36,12 @@ def colorized_logger(name):
     A lightweight customization of the Python standard library's ``logging`` module
     loggers, to provide colorized log messages.
 
-    Args:
-        name (str):
-            The name of the logger to requisition. Typically a module's
-            ``__name__`` attribute.
+    :param name:
+        The name of the logger to requisition. Typically a module's
+        ``__name__`` attribute.
+    :type name: str
 
-    Returns:
+    :return:
         The logger.
     """
     logger = logging.getLogger(re.sub(r'^schurtransform\.', '', name))

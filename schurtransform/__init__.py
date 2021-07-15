@@ -6,6 +6,6 @@ global_transformer = SchurTransform()
 
 def transform(samples, **kwargs):
     """
-    See :py:meth:`schurtransform.schur_transform.SchurTransform.transform`.
+    See :py:meth:`.schur_transform.SchurTransform.transform`.
     """
     return global_transformer.transform(samples, **kwargs)
