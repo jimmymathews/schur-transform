@@ -14,7 +14,7 @@ requirements = [
     'pandas==1.1.5',
 ]
 
-version = '0.1.38'
+version = '0.1.39'
 
 setuptools.setup(
     name='schurtransform',
