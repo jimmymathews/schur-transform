@@ -24,9 +24,9 @@ copyright = '2021, James Mathews'
 author = 'James Mathews'
 
 # The short X.Y version
-version = ''
+# version = ''
 # The full version, including alpha/beta/rc tags
-release = '0.1.33'
+release = '0.1.38'
 
 
 # -- General configuration ---------------------------------------------------
