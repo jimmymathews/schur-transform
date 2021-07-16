@@ -1,19 +1,21 @@
 import setuptools
 import os
 
-dir = os.path.dirname(__file__)
+dir = os.path.dirname(os.path.realpath(__file__))
 
 with open(os.path.join(dir, 'README.rst'), 'r', encoding='utf-8') as fh:
     long_description = fh.read()
-
-with open(os.path.join(dir, 'requirements.txt'), 'r', encoding='utf-8') as fh:
-    requirements = fh.read().split('\n')
 
 with open(os.path.join(dir, 'VERSION')) as fh:
     version = fh.read().rstrip('\n')
 
 with open(os.path.join(dir, 'schurtransform', 'lung_data', 'examples_manifest.csv')) as fh:
     example_files = [row.split(',')[0] for row in fh.read().split('\n')]
+
+requirements = [
+    'numpy==1.21.0',
+    'pandas==1.1.5',
+]
 
 setuptools.setup(
     name='schurtransform',
