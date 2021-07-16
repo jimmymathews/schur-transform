@@ -100,6 +100,8 @@ class CharacterTable:
     def get_conjugacy_classes(self):
         """
 
+        ...
+        
         :return: The literal conjugacy classes of permutations of the given degree. The
             keys are '+'-delimited integer partition strings (as given in the character
             tables), and values are the permutations in the indicated conjugacy class.

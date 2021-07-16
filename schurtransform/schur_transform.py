@@ -177,6 +177,8 @@ class SchurTransform:
     ):
         """
 
+        ...
+        
         :param dimension: The dimension of the base vector space.
 
         :type dimension: int

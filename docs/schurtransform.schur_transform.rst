@@ -5,7 +5,3 @@ schurtransform.schur\_transform module
     :members:
     :undoc-members:
     :show-inheritance:
-
-    .. autoclass:: SchurTransform(type)
-
-        .. automethod:: recalculate_projectors(dimension, degree)
