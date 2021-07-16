@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from functools import lru_cache
+from functools import lru_cache, wraps
 from itertools import combinations
 from math import factorial
 
@@ -176,19 +176,21 @@ class SchurTransform:
         degree: int=None,
     ):
         """
-        :param dimension:
-            The dimension of the base vector space.
+
+        :param dimension: The dimension of the base vector space.
+
         :type dimension: int
 
-        :param degree:
-            The number of factors in the tensor product.
+        :param degree: The number of factors in the tensor product.
+
         :type degree: int
 
-        :return:
-            Keys are the integer partition strings, values are the
+        :return: Keys are the integer partition strings, values are the
             :py:class:`.tensor_operator.TensorOperator` objects of the corresponding
             Young projectors.
+
         :rtype: dict
+
         """
         character_table = CharacterTable(degree=degree)
         conjugacy_classes = character_table.get_conjugacy_classes()

@@ -99,13 +99,15 @@ class CharacterTable:
     @lru_cache(maxsize=1)
     def get_conjugacy_classes(self):
         """
-        :return:
-            The literal conjugacy classes of permutations of the given degree. The keys
-            are '+'-delimited integer partition strings (as given in the character
+
+        :return: The literal conjugacy classes of permutations of the given degree. The
+            keys are '+'-delimited integer partition strings (as given in the character
             tables), and values are the permutations in the indicated conjugacy class.
             The format of the permutations is a sequence of positive integer function
             values.
+
         :rtype: dict
+
         """
         partition_strings = self.conjugacy_class_representatives
         partition_strings_by_partition = {

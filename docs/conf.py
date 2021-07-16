@@ -26,7 +26,7 @@ author = 'James Mathews'
 # The short X.Y version
 # version = ''
 # The full version, including alpha/beta/rc tags
-release = '0.1.40'
+release = '0.1.41'
 
 
 # -- General configuration ---------------------------------------------------

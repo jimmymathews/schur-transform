@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sphinx-apidoc -M --implicit-namespaces -e -f -d1 ../schurtransform -o . && \
+sphinx-apidoc -M --implicit-namespaces -e -d1 ../schurtransform -o . && \
    make html
 
  # && \
