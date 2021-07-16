@@ -3,7 +3,7 @@ import os
 
 dir = os.path.dirname(__file__)
 
-with open(os.path.join(dir, 'README.md'), 'r', encoding='utf-8') as fh:
+with open(os.path.join(dir, 'README.rst'), 'r', encoding='utf-8') as fh:
     long_description = fh.read()
 
 with open(os.path.join(dir, 'requirements.txt'), 'r', encoding='utf-8') as fh:
@@ -44,6 +44,9 @@ setuptools.setup(
     },
     classifiers=[
         'Programming Language :: Python :: 3',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'Topic :: Scientific/Engineering',
+        'Intended Audience :: Science/Research',
     ],
     python_requires='>=3.8',
     install_requires=requirements,
