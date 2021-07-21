@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+
+import schurtransform
+from schurtransform.schur_transform import save_projectors_to_file
+
+save_projectors_to_file()

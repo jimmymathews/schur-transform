@@ -49,6 +49,9 @@ class CharacterTable:
                 key : row[key] for key in row.keys()
             }
 
+    def get_conjugacy_class_representatives(self):
+        return self.conjugacy_class_representatives
+
     @staticmethod
     def partition_from_permutation(permutation):
         """

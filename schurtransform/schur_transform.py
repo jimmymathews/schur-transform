@@ -1,3 +1,4 @@
+import importlib.resources
 from enum import Enum, auto
 from functools import lru_cache, wraps
 from itertools import combinations
@@ -8,6 +9,7 @@ import numpy as np
 from .tensor import Tensor
 from .tensor_operator import TensorOperator
 from .character_table import CharacterTable
+from . import projectors as projectors_package
 from .log_formats import colorized_logger
 logger = colorized_logger(__name__)
 
@@ -25,6 +27,9 @@ class DecompositionSummary(Enum):
 
 
 class SchurTransform:
+    max_dimension = 3
+    max_degree = 6
+
     def transform(self,
         samples,
         summary: str='COMPONENTS',
@@ -42,7 +47,10 @@ class SchurTransform:
             - the index indicating the series/variable
             - the sample index
             - the spatial coordinate index
-        :type samples: multi-dimensional array-like
+
+            If a dictionary, the keys may be case identifiers and each value must be as
+            above.
+        :type samples: multi-dimensional array-like, or dict
 
         :param summary:
             Indication of what to return. Must be the string name of one of the members
@@ -96,6 +104,15 @@ class SchurTransform:
             distributions obtained in the ``CONTENT`` case are provided.
         :rtype: dict
         """
+        if type(samples) is dict:
+            return {case : self.transform(
+                samples[case],
+                summary = summary,
+                number_of_factors = number_of_factors,
+                character_table_filename = character_table_filename,
+                conjugacy_classes_table_filename = conjugacy_classes_table_filename,
+            ) for case in samples}
+
         if type(samples) is list:
             samples = np.array(samples)
 
@@ -127,9 +144,13 @@ class SchurTransform:
             degree=degree,
         )
         if summary in [DecompositionSummary.COMPONENTS, DecompositionSummary.NORMS]:
+            logger.debug('Centralizing input sample data.')
             centered = self.recenter_at_mean(samples)
+            logger.debug('Creating covariance tensor.')
             covariance_tensor = self.calculate_covariance_tensor(centered)
+            logger.debug('Decomposing covariance tensor.')
             decomposition = self.calculate_decomposition(covariance_tensor, projectors)
+            logger.debug('Validating decomposition.')
             self.validate_decomposition(decomposition, covariance_tensor)
 
             if summary == DecompositionSummary.COMPONENTS:
@@ -174,27 +195,33 @@ class SchurTransform:
     def recalculate_projectors(self,
         dimension: int=None,
         degree: int=None,
+        get_cached: bool=True,
     ):
         """
 
         ...
         
         :param dimension: The dimension of the base vector space.
-
         :type dimension: int
 
         :param degree: The number of factors in the tensor product.
-
         :type degree: int
+
+        :param get_cached: Default True. If True, attempts to retrieve the projectors
+            from cached numpy-exported archive files.
+        :type get_cached: bool
 
         :return: Keys are the integer partition strings, values are the
             :py:class:`.tensor_operator.TensorOperator` objects of the corresponding
             Young projectors.
-
         :rtype: dict
-
         """
+        if get_cached:
+            projectors = self.retrieve_projectors(dimension=dimension, degree=degree)
+            return projectors
+
         character_table = CharacterTable(degree=degree)
+        logger.debug('Grouping permutations on %s elements into conjugacy classes.', degree)
         conjugacy_classes = character_table.get_conjugacy_classes()
         aggregated_permutation_operators = {
             partition_string : TensorOperator(
@@ -202,7 +229,9 @@ class SchurTransform:
                 dimension=dimension,
             ) for partition_string in conjugacy_classes.keys()
         }
+        logger.debug('Aggregating permutation operators along %s classes.', len(conjugacy_classes))
         for partition_string, conjugacy_class in conjugacy_classes.items():
+            logger.debug('Doing aggregation over %s elements.', len(conjugacy_class))
             for permutation in conjugacy_class:
                 aggregated_permutation_operators[partition_string].add(
                     TensorOperator(
@@ -393,3 +422,62 @@ class SchurTransform:
         else:
             logger.debug('Components sum to original tensor.')
             return True
+
+    @staticmethod
+    def format_projectors_filename(degree, dimension):
+        return '_'.join([
+            'projectors',
+            'degree',
+            str(degree),
+            'dimension',
+            str(dimension) + '.npz',
+        ])
+
+    def retrieve_projectors(self, dimension: int=None, degree: int=None):
+        """
+        Retrieve projectors from archived numpy-exported files.
+
+        :param dimension: Spatial dimension.
+        :type dimension: int
+
+        :param degree: Degree of symmetric group.
+        :type degree: int
+
+        :return: Dictionary with keys the '+'-delimited integer partitions and values
+            the :py:class:`.tensor_operator.TensorOperator` projectors.
+        :rtype: dict
+        """
+        if degree > SchurTransform.max_degree:
+            logger.error('Can not retrieve projectors from cache for degree %s', degree)
+            return
+        if dimension > SchurTransform.max_dimension:
+            logger.error('Can not retrieve projectors from cache for dimension %s', dimension)
+            return
+
+        filename = SchurTransform.format_projectors_filename(degree, dimension)
+        with importlib.resources.path(package=projectors_package, resource=filename) as path:
+            projectors_npy = np.load(path)
+
+        projectors = {key : TensorOperator(number_of_factors = degree, dimension = dimension) for key in projectors_npy}
+        for key in projectors_npy:
+            projectors[key].data = projectors_npy[key]
+        return projectors
+
+
+def save_projectors_to_file():
+    """
+    Pre-calculates the projectors and saves to numpy archive format.
+
+    The filenames are formatted as in "projectors_degree_5_dimension_3.npz".
+    """
+    st = SchurTransform()
+    for d in range(2, SchurTransform.max_dimension+1):
+        for i in range(2, SchurTransform.max_degree+1):
+            projectors = st.recalculate_projectors(
+                dimension = d,
+                degree = i,
+                get_cached = False,
+            )
+            filename = SchurTransform.format_projectors_filename(i, d)
+            np.savez(filename, **{key : projector.data for key, projector in projectors.items()})
+            logger.info('Saved %s', filename)

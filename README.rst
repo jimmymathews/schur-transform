@@ -59,8 +59,24 @@ The components are the GL(k)- or Sn-isotypic components of the covariance tensor
 
 The library ships with the character tables up to S8. For more than 8-fold statistics, see ``generate_characters/`` for information about using `GAP <https://www.gap-system.org/>`_ to generate additional character tables.
 
-Example
--------
-``demo.py`` is a more extensive usage example. It calculates the *Schur content* (many Schur transforms for various subsets of the series index) of a lung deformation as measured by a 4D CT scan. Data available for download from `DIR-lab <https://dir-lab.com>`_.
+Plotting example
+----------------
+::
+    import matplotlib.pyplot as plt
 
-![alttext](combo_dirlab_sc.png)
+    import schurtransform as st
+    from schurtransform.examples import get_example_data
+    from schurtransform.plotting import create_figure
+
+    input_data = st.get_example_data(dataset = 'lung 4DCT')
+    number_of_factors = 5
+
+    summary = 'CONTENT'
+    transform_data = st.transform(input_data, summary=summary, number_of_factors=number_of_factors)
+    fig1, ax1 = create_figure(transform_data, summary=summary)
+
+    plt.show()
+
+This calculates the *Schur content* (many Schur transforms for various subsets of the series index) of a lung deformation as measured by a 4D CT scan. Data available for download from `DIR-lab <https://dir-lab.com>`_.
+
+.. image:: schur_content_dirlab.png

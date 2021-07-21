@@ -31,5 +31,5 @@ def get_example_data(dataset: str=None):
             time_step = int(row['time step'])
             data_dict[time_step][case_number] = points
 
-        data = [[data_dict[time_step][case_number] for time_step in range(6)] for case_number in range(1,6)]
+        data = {case_number : [data_dict[time_step][case_number] for time_step in range(6)] for case_number in range(1,6)}
         return data
