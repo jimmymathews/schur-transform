@@ -1,2 +1,2 @@
 
-[Documentation](schurtransform.readthedocs.io)
+[Documentation](https://schurtransform.readthedocs.io)
