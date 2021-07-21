@@ -61,7 +61,7 @@ The library ships with the character tables up to S8. For more than 8-fold stati
 
 Plotting example
 ----------------
-::
+A more extensive usage example::
     import matplotlib.pyplot as plt
 
     import schurtransform as st
