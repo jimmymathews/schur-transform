@@ -27,6 +27,9 @@ class DecompositionSummary(Enum):
 
 
 class SchurTransform:
+    """
+    The main computation orchestration object.
+    """
     max_dimension = 3
     max_degree = 6
 
@@ -74,14 +77,14 @@ class SchurTransform:
         :type conjugacy_classes_filename: str
 
         :return: Depending on the value of ``summary``,
-            
+
             - ``COMPONENTS``. Returns the tensor components of the Schur-Weyl
-              decomposition of the joint moment tensor, the tensor product over the series
-              index.
+              decomposition of the joint moment tensor, the tensor product over the
+              series index.
             - ``NORMS``. Returns the Euclidean norms of the tensor components of the
               Schur-Weyl decomposition.
-            - ``CONTENT``. Returns a list of distributions, one for each tensor component
-              type, consisting of the Euclidean norms of that component of the
+            - ``CONTENT``. Returns a list of distributions, one for each tensor
+              component type, consisting of the Euclidean norms of that component of the
               decomposition of all N-factor joint moments, where N is the given
               ``number_of_factors``.
             - ``SEQUENTIAL_CONTENT``. Returns a list of distributions just as in the
@@ -94,7 +97,7 @@ class SchurTransform:
 
         :rtype: dict
         """
-        if type(samples) is dict:
+        if isinstance(samples, dict):
             return {case : self.transform(
                 samples[case],
                 summary = summary,
@@ -103,11 +106,18 @@ class SchurTransform:
                 conjugacy_classes_table_filename = conjugacy_classes_table_filename,
             ) for case in samples}
 
-        if type(samples) is list:
+        if isinstance(samples, list):
             samples = np.array(samples)
 
         if len(samples.shape) != 3:
-            logger.error('Expected 3 axes: series (random variable), sample, and spatial coordinate. Got axes of sizes: %s', samples.shape)
+            logger.error(
+                ''.join([
+                    'Expected 3 axes:',
+                    'series (random variable), sample, and spatial coordinate.',
+                    'Got axes of sizes: %s',
+                ]),
+                samples.shape,
+            )
             return
 
         number_of_series = samples.shape[0]
@@ -156,19 +166,21 @@ class SchurTransform:
             DecompositionSummary.VARIANCE_CONTENT,
         ]:
             if summary == DecompositionSummary.SEQUENTIAL_CONTENT:
-                index_combinations = [[i + j for j in range(degree)] for i in range(number_of_series-(degree-1))]
+                index_combinations = [
+                    [i + j for j in range(degree)] for i in range(number_of_series-(degree-1))
+                ]
             else:
                 index_combinations = combinations(list(range(number_of_series)), degree)
 
             character_table = CharacterTable(degree=degree)
-            content = {key : [] for key in character_table.get_characters().keys()}
+            content = {key : [] for key in character_table.get_characters()}
             for combination in index_combinations:
                 subsample = samples[list(combination), :, :]
                 centered = self.recenter_at_mean(subsample)
                 covariance_tensor = self.calculate_covariance_tensor(centered)
                 decomposition = self.calculate_decomposition(covariance_tensor, projectors)
                 self.validate_decomposition(decomposition, covariance_tensor)
-                norms = {i: np.linalg.norm(component.data) for i, component in decomposition.items()}
+                norms = {i: np.linalg.norm(comp.data) for i, comp in decomposition.items()}
                 for i, norm in norms.items():
                     content[i].append(norm)
 
@@ -189,7 +201,7 @@ class SchurTransform:
     ):
         """
         (This function is wrapped by ``functools.lru_cache``).
-        
+
         :param dimension: The dimension of the base vector space.
         :type dimension: int
 
@@ -237,9 +249,9 @@ class SchurTransform:
             ) for key in character_table.get_characters().keys()
         }
         for key, character in character_table.get_characters().items():
-            for partition_string, aggregated_permutation_operator in aggregated_permutation_operators.items():
+            for partition_string, aggregated_operator in aggregated_permutation_operators.items():
                 projectors[key].add(
-                    aggregated_permutation_operator.scale_by(amount=character[partition_string]),
+                    aggregated_operator.scale_by(amount=character[partition_string]),
                     inplace=True,
                 )
             character_dimension = character[character_table.get_identity_partition_string()]
@@ -283,7 +295,10 @@ class SchurTransform:
         tolerance = np.linalg.norm(accumulator.data) / pow(10, 9)
         if not np.linalg.norm(accumulator.data - identity_scaled.data) < tolerance:
             logger.error('Projectors do not sum to identity.')
-            logger.error('Norm of defect: %s', np.linalg.norm(accumulator.data - identity_scaled.data))
+            logger.error(
+                'Norm of defect: %s',
+                np.linalg.norm(accumulator.data - identity_scaled.data),
+            )
             return False
         else:
             logger.debug('Projectors sum to identity.')
@@ -301,7 +316,7 @@ class SchurTransform:
             - the spatial coordinate index
 
         :type samples: multi-dimensional array-like
-        
+
         :return: Same as ``samples``, except that a translation is applied to each
             spatial variable which results in the new variable having mean vector equal
             to 0.
@@ -310,7 +325,9 @@ class SchurTransform:
         degree = samples.shape[0]
         number_of_samples = samples.shape[1]
         dimension = samples.shape[2]
-        means = np.array([[np.mean(samples[i,:,a]) for a in range(dimension)] for i in range(degree)])
+        means = np.array(
+            [[np.mean(samples[i,:,a]) for a in range(dimension)] for i in range(degree)]
+        )
         recentered = np.zeros(samples.shape)
         for i in range(degree):
             for a in range(dimension):

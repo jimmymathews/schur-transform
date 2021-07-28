@@ -1,8 +1,9 @@
+import re
+
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import re
 
 from .log_formats import colorized_logger
 logger = colorized_logger(__name__)
