@@ -16,7 +16,7 @@ requirements = [
     'seaborn==0.11.1',
 ]
 
-version = '0.1.53'
+version = '0.1.54'
 
 setuptools.setup(
     name='schurtransform',
@@ -28,6 +28,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     scripts=[
         'scripts/schurtransform-calculate-projectors',
+        'scripts/regenerate-symmetric-group-characters',
     ],
     packages=[
         'schurtransform',

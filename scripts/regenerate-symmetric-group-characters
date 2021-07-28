@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+import argparse
+import re
+import subprocess
+
+import schurtransform
+from schurtransform.parsing_gap_output import CharacterTableGAPTextParser
+
+gap_program=r'''
+for i in [2..{{max degree}}] do
+tbl:=CharacterTable("symmetric", i);
+Print("Character table GAP output magic header separator\n");
+
+Print("Begin section: Rank of symmetric group\n");
+Print(String(i));
+Print("\nEnd section.\n");
+
+Print("Begin section: Character function values\n");
+PrintObj(Irr(tbl));
+Print("\nEnd section.\n");
+
+Print("Begin section: Partition labels for the sequence of character functions\n");
+PrintObj(CharacterParameters(tbl));
+Print("\nEnd section.\n");
+
+Print("Begin section: Partition labels for the sequence of conjugacy classes (the domain of each character function)\n");
+PrintObj(ClassParameters(tbl));
+Print("\nEnd section.\n");
+
+Print("Begin section: Sizes of conjugacy classes\n");
+PrintObj(SizesConjugacyClasses(tbl));
+Print("\nEnd section.\n");
+od;
+quit;
+'''
+
+parser = argparse.ArgumentParser(description='Generate character tables for Sn using GAP.')
+parser.add_argument(
+    '--max-degree',
+    type=int,
+    help='The maximum degree symmetric group to consider',
+)
+args = parser.parse_args()
+if args.max_degree is None or args.max_degree < 2:
+    print('Use --max-degree N for N equal to 3 or more.')
+    exit()
+
+gap_program = re.sub('{{max degree}}', str(args.max_degree), gap_program)
+gap_program_filename = 'compute_characters.g'
+with open(gap_program_filename, 'w') as file:
+    file.write(gap_program)
+
+gap_output = subprocess.run(
+    ['gap', '--nointeract', gap_program_filename],
+    capture_output=True,
+    encoding='utf-8',
+).stdout
+
+parser = CharacterTableGAPTextParser(gap_output)
+parser.create_tables()
+

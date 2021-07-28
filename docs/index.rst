@@ -11,4 +11,5 @@ Table of Contents
 
    readme
    Library docs <schurtransform>
+   Regenerate characters <generatecharacters>
    genindexplaceholder

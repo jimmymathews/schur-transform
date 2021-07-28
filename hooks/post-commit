@@ -5,7 +5,6 @@ microversion=$(echo $versionline | grep -oP "[0-9]+'")
 microversion=$(echo $microversion | grep -oP "[0-9]+")
 microversion=$(( microversion + 1 ))
 newversionline="$macroversion$microversion'"
-
 sed -i "s/$versionline/$newversionline/g" setup.py
 
 releaseline=$(cat docs/conf.py | grep -oP "^release = '[0-9]+\.[0-9]+\.[0-9]+'$")
