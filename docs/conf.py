@@ -14,10 +14,8 @@ project = 'schurtransform'
 copyright = '2021, James Mathews'
 author = 'James Mathews'
 
-# The short X.Y version
-# version = ''
-# The full version, including alpha/beta/rc tags
-release = '0.1.48'
+version = '0.1'
+release = '0.1.52'
 
 # -- General configuration ---------------------------------------------------
 needs_sphinx = '1.8.5'
@@ -47,6 +45,8 @@ html_theme = 'sphinx_rtd_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_logo = '_static/decomp_logo.png'
 
 htmlhelp_basename = 'schurtransformdoc'
 

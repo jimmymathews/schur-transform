@@ -8,21 +8,27 @@ class Tensor:
     def __init__(self,
         number_of_factors: int=None,
         dimension: int=None,
+        data=None,
     ):
         """
         Initializes a zero tensor.
 
-        :param number_of_factors:
-            Number of tensor factors for the background tensor product vector space.
+        :param number_of_factors: Number of tensor factors for the background tensor
+            product vector space.
         :type number_of_factors: int
 
-        :param dimension:
-            The dimension of the base vector space.
+        :param dimension: The dimension of the base vector space.
         :type dimension: int
+
+        :param data: The exact data array to initialize with. (Defaults to zeros).
+        :type data: numpy.array
         """
         self.number_of_factors = number_of_factors
         self.dimension = dimension
-        self.data = np.zeros([dimension] * number_of_factors)
+        if data is None:
+            self.data = np.zeros([dimension] * number_of_factors)
+        else:
+            self.data = data
 
     def get_entry_iterator(self):
         """
@@ -34,7 +40,7 @@ class Tensor:
         values with ``it = new_value``.
 
         :return:
-            The iterator.
+            The iterator (``it``).
         :rtype: iterable
         """
         return np.nditer(self.data, flags = ['multi_index'], op_flags=['readwrite'])
@@ -46,16 +52,13 @@ class Tensor:
         """
         Addition of another tensor.
 
-        :param other_tensor:
-            The other :py:class:`Tensor` object to add.
+        :param other_tensor: The other :py:class:`Tensor` object to add.
         :type other_tensor: Tensor
 
-        :param inplace:
-            If True, adds in place (so that a new :py:class:`Tensor` is not returned).
+        :param inplace: If True, adds in place (so that a new :py:class:`Tensor` is not returned).
         :type inplace: bool
 
-        :return:
-            The sum (unless ``inplace=True``, then returns None).
+        :return: The sum (unless ``inplace=True``, then returns None).
         :rtype: Tensor
         """
         if inplace:
@@ -75,17 +78,14 @@ class Tensor:
         """
         Scalar multiplication, entrywise.
 
-        :param amount:
-            The scalar to multiply by.
+        :param amount: The scalar to multiply by.
         :type amount: float
 
-        :param inplace:
-            If True, returns None and modifies this :py:class:`Tensor` object in-place.
-            Otherwise returns a new :py:class:`Tensor`, scaled.
+        :param inplace: If True, returns None and modifies this :py:class:`Tensor`
+            object in-place. Otherwise returns a new :py:class:`Tensor`, scaled.
         :type inplace: bool
 
-        :return:
-            The scaled tensor (unless ``inplace=True``, then returns None).
+        :return: The scaled tensor (unless ``inplace=True``, then returns None).
         :rtype: Tensor
         """
         if inplace:

@@ -15,28 +15,38 @@ class TensorOperator:
         dimension: int=None,
         identity: bool=False,
         permutation_inverse=None,
+        data=None,
     ):
         """
-        :param number_of_factors:
-            Number of tensor factors for the background tensor product vector space.
+        :param number_of_factors: Number of tensor factors for the background tensor
+            product vector space.
         :type number_of_factors: int
 
-        :param dimension:
-            The dimension of the base vector space.
+        :param dimension: The dimension of the base vector space.
         :type dimension: int
 
-        :param identity:
-            If True, initializes the TensorOperator to the identity operator.
+        :param identity: If True, initializes the TensorOperator to the identity
+            operator.
         :type identity: bool
 
-        :param permutation_inverse:
-            If provided, initializes the TensorOperator to be the operation of
-            permutation of the tensor factors, for the inverse of the permutation
-            indicated by this list of positive integers (e.g. ``[2, 1, 3]``).
+        :param permutation_inverse: If provided, initializes the
+            :py:class:`TensorOperator` to be the operation of permutation of the
+            tensor factors, for the inverse of the permutation indicated by this list of
+            positive integers (e.g. ``[2, 1, 3]``).
         :type permutation_inverse: list
+
+        :param data: If provided, initialized with exactly the given data array.
+        :type data: numpy.array
         """
         self.number_of_factors = number_of_factors
         self.dimension = dimension
+        if not data is None:
+            if identity or (not permutation_inverse is None):
+                logger.error('If specifying exact data array, do not provide identity flag or permutation!')
+            else:
+                self.data = data
+            return
+
         self.data = np.zeros(
             [dimension] * (number_of_factors * 2)
         )
@@ -68,13 +78,11 @@ class TensorOperator:
         input_tensor: Tensor=None,
     ):
         """
-        :param input_tensor:
-            The input to which to apply the :py:class:`TensorOperator`.
+        :param input_tensor: The input to which to apply the :py:class:`TensorOperator`.
         :type input_tensor: Tensor
 
-        :return:
-            Result of application of the :py:class:`TensorOperator` linear map.
-        :rtype: Tensor
+        :return: Result of application of the :py:class:`TensorOperator` linear map.
+        :rtype: :py:class:`.tensor.Tensor`
         """
         if (
             input_tensor.number_of_factors != self.number_of_factors or
@@ -94,8 +102,8 @@ class TensorOperator:
         output_tensor = Tensor(
             number_of_factors=self.number_of_factors,
             dimension=self.dimension,
+            data=output_data,
         )
-        output_tensor.data = output_data
         return output_tensor
 
     def add(self,
@@ -103,17 +111,14 @@ class TensorOperator:
         inplace: bool=False,
     ):
         """
-        :param other_operator:
-            Another operator to add in-place.
+        :param other_operator: Another operator to add in-place.
         :type other_operator: TensorOperator
 
-        :param inplace:
-            If True, adds the other operator in place (so that a new
+        :param inplace: If True, adds the other operator in place (so that a new
             :py:class:`TensorOperator` is not returned).
         :type inplace: bool
 
-        :return:
-            The sum (unless ``inplace=True``, then returns None).
+        :return: The sum (unless ``inplace=True``, then returns None).
         :rtype: TensorOperator
         """
         if inplace:
@@ -133,17 +138,15 @@ class TensorOperator:
         """
         Scalar multiplication, entrywise.
 
-        :param amount:
-            The scalar to multiply by.
+        :param amount: The scalar to multiply by.
         :type amount: float
 
-        :param inplace:
-            If True, returns None and modifies this :py:class:`TensorOperator` object
-            in-place. Otherwise returns a new :py:class:`TensorOperator`, scaled.
+        :param inplace: If True, returns None and modifies this
+            :py:class:`TensorOperator` object in-place. Otherwise returns a new
+            :py:class:`TensorOperator`, scaled.
         :type inplace: bool
 
-        :return:
-            The scaled operator (unless ``inplace=True``, then returns None).
+        :return: The scaled operator (unless ``inplace=True``, then returns None).
         :rtype: TensorOperator
         """
         if inplace:

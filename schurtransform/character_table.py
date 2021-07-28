@@ -18,8 +18,7 @@ class CharacterTable:
         degree: int=None,
     ):
         """
-        :param degree:
-            The degree of the symmetric group to be considered.
+        :param degree: The degree of the symmetric group to be considered.
         :type degree: int
         """  
         self.degree = degree
@@ -55,13 +54,12 @@ class CharacterTable:
     @staticmethod
     def partition_from_permutation(permutation):
         """
-        :param permutation:
-            A list of positive integers providing the values (in order) of a permutation
-            function of an input set of 1-indexed integers.
+        :param permutation: A list of positive integers providing the values (in order)
+            of a permutation function of an input set of 1-indexed integers.
         :type permutation: list
 
-        :return:
-            A sorted list of integers that are the cycle lengths of the permutation.
+        :return: A sorted list of integers that are the cycle lengths of the
+            permutation.
         :rtype: list
         """
         if sorted(permutation) != [i + 1 for i in range(len(permutation))]:
@@ -83,16 +81,14 @@ class CharacterTable:
 
     def get_identity_partition_string(self):
         """
-        :return:
-            The string representing the identity partition for the given degree.
+        :return: The string representing the identity partition for the given degree.
         :rtype: str
         """
         return '+'.join(['1'] * self.degree)
 
     def get_characters(self):
         """
-        :return:
-            A dictionary of dictionaries, each dictionary being the class function
+        :return: A dictionary of dictionaries, each dictionary being the class function
             represented by one character of the symmetric group of degree ``degree``.
             The keys (at both levels) are '+'-delimited integer partition strings.
         :rtype: dict
@@ -102,17 +98,14 @@ class CharacterTable:
     @lru_cache(maxsize=1)
     def get_conjugacy_classes(self):
         """
-
-        ...
+        (This function is wrapped by functools.lru_cache.)
         
         :return: The literal conjugacy classes of permutations of the given degree. The
             keys are '+'-delimited integer partition strings (as given in the character
             tables), and values are the permutations in the indicated conjugacy class.
             The format of the permutations is a sequence of positive integer function
             values.
-
         :rtype: dict
-
         """
         partition_strings = self.conjugacy_class_representatives
         partition_strings_by_partition = {

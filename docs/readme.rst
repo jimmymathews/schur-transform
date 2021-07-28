@@ -57,27 +57,32 @@ This outputs::
 
 The components are the GL(k)- or Sn-isotypic components of the covariance tensor of ``data`` in the tensor space with ``n`` tensor factors and ``k`` dimensions for each factor. Each one is presented as a multi-dimensional numpy array with ``n`` indices ranging across ``k`` values.
 
-The library ships with the character tables up to S8. For more than 8-fold statistics, see ``generate_characters/`` for information about using `GAP <https://www.gap-system.org/>`_ to generate additional character tables.
+The library ships with the character tables up to S6. For more than 6-fold statistics, see ``generate_characters/`` for information about using `GAP <https://www.gap-system.org/>`_ to generate additional character tables.
 
 Plotting example
 ----------------
 A more extensive usage example::
 
     import matplotlib.pyplot as plt
-
     import schurtransform as st
-    from schurtransform.examples import get_example_data
-    from schurtransform.plotting import create_figure
 
     input_data = st.get_example_data(dataset = 'lung 4DCT')
-    number_of_factors = 5
 
-    summary = 'CONTENT'
-    transform_data = st.transform(input_data, summary=summary, number_of_factors=number_of_factors)
-    fig1, ax1 = create_figure(transform_data, summary=summary)
+    transform_data = st.transform(input_data, summary='CONTENT', number_of_factors=5)
+    fig1, ax1 = st.create_figure(transform_data, summary='CONTENT')
+
+    transform_data = st.transform(input_data, summary='CONTENT', number_of_factors=6)
+    fig2, ax2 = st.create_figure(transform_data, summary='CONTENT')
 
     plt.show()
 
 This calculates the *Schur content* (many Schur transforms for various subsets of the series index) of a lung deformation as measured by a 4D CT scan. Data available for download from `DIR-lab <https://dir-lab.com>`_.
 
-.. image:: schur_content_dirlab.png
+.. image:: _static/schur_content_5_factor.png
+    :target: _static/schur_content_5_factor.png
+
+.. image:: _static/schur_content_6_factor.png
+    :target: _static/schur_content_6_factor.png
+
+.. image:: _static/anim_150_150.gif
+    :align: center

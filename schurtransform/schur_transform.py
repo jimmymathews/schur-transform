@@ -1,6 +1,6 @@
 import importlib.resources
 from enum import Enum, auto
-from functools import lru_cache, wraps
+from functools import lru_cache
 from itertools import combinations
 from math import factorial
 
@@ -38,70 +38,60 @@ class SchurTransform:
         conjugacy_classes_table_filename: str=None,
     ):
         """
-        :param samples:
-            "Registered" spatial samples data.
-            
-            A multi-dimensional array, or nested list of lists of lists. The axis
-            indices are respectively:
+        :param samples: "Registered" spatial samples data. A multi-dimensional array, or
+            nested list of lists of lists. The axis indices are respectively:
 
             - the index indicating the series/variable
             - the sample index
             - the spatial coordinate index
 
-            If a dictionary, the keys may be case identifiers and each value must be as
-            above.
+            If a dictionary, the keys may be case identifiers and each value must be a
+            list of lists of lists (or numpy array) as above.
         :type samples: multi-dimensional array-like, or dict
 
-        :param summary:
-            Indication of what to return. Must be the string name of one of the members
-            of the enum class :py:class:`DecompositionSummary`. See the cases for
-            return value.
+        :param summary: Indication of what to return. Must be the string name of one of
+            the members of the enum class :py:class:`DecompositionSummary`. See the
+            cases for return value.
         :type summary: str
 
-        :param number_of_factors:
-            In case of one of the ``...CONTENT`` summary types, this integer provides the
-            number of factors (number of variables) used in the joint moment. Currently
-            this must be less than or equal to 8, unless you provide your own character
-            table and conjugacy class information.
+        :param number_of_factors: In case of one of the ``...CONTENT`` summary types,
+            this integer provides the number of factors (number of variables) used in
+            the joint moment. Currently this must be less than or equal to 6, unless you
+            provide your own character table and conjugacy class information.
         :type number_of_factors: int
 
-        :param character_table_filename:
-            Only provide this argument if you wish to supply a character table for a
-            symmetric group of degree higher than 8 (beyond S8). Use the file format
-            exemplified by ``s2.csv``, ``s3.csv``, etc. under the
-            :py:mod:`schurtransform.character_tables` subpackage.
+        :param character_table_filename: Only provide this argument if you wish to
+            supply a character table for a symmetric group of degree higher than 6
+            (beyond S6). Use the file format exemplified by ``s2.csv``, ``s3.csv``, etc.
+            under the :py:mod:`schurtransform.character_tables` subpackage.
         :type character_table_filename: str
 
-        :param conjugacy_classes_table_filename:
-            Only provide this argument if you wish to supply a character table for a
-            symmetric group of degree higher than 8 (beyond S8). Use the file format
-            exemplified by ``symmetric_group_conjugacy_classes.csv`` in the
+        :param conjugacy_classes_table_filename: Only provide this argument if you wish
+            to supply a character table for a symmetric group of degree higher than 6
+            (beyond S6). Use the file format exemplified by
+            ``symmetric_group_conjugacy_classes.csv`` in the
             :py:mod:`schurtransform.character_tables` subpackage.
         :type conjugacy_classes_filename: str
 
-        :return:
-            If ``summary`` is ``COMPONENTS``, returns the tensor components of the
-            Schur-Weyl decomposition of the joint moment tensor, the tensor product over
-            the series index.
+        :return: Depending on the value of ``summary``,
+            
+            - ``COMPONENTS``. Returns the tensor components of the Schur-Weyl
+              decomposition of the joint moment tensor, the tensor product over the series
+              index.
+            - ``NORMS``. Returns the Euclidean norms of the tensor components of the
+              Schur-Weyl decomposition.
+            - ``CONTENT``. Returns a list of distributions, one for each tensor component
+              type, consisting of the Euclidean norms of that component of the
+              decomposition of all N-factor joint moments, where N is the given
+              ``number_of_factors``.
+            - ``SEQUENTIAL_CONTENT``. Returns a list of distributions just as in the
+              ``CONTENT`` case, except that only consecutive N-fold products are
+              considered.
+            - ``MEAN_CONTENT``. The means of the distributions obtained in the
+              ``CONTENT`` case are provided (one for each tensor component type).
+            - ``VARIANCE_CONTENT``. The variances of the distributions obtained in the
+              ``CONTENT`` case are provided.
 
-            If ``summary`` is ``NORMS``, returns the Euclidean norms of the tensor
-            components of the Schur-Weyl decomposition.
-
-            If ``summary`` is ``CONTENT``, returns a list of distributions, one for
-            each tensor component type, consisting of the Euclidean norms of that
-            component of the decomposition of all N-factor joint moments, where N is the
-            given ``number_of_factors``.
-
-            If ``summary`` is ``SEQUENTIAL_CONTENT``, returns a list of distributions
-            just as in the ``CONTENT`` case, except that only consecutive N-fold
-            products are considered.
-
-            If ``summary`` is ``MEAN_CONTENT``, the means of the distributions
-            obtained in the "CONTENT" case are provided (one for each tensor component
-            type).
-
-            If ``summary`` is ``VARIANCE_CONTENT``, the variances of the
-            distributions obtained in the ``CONTENT`` case are provided.
         :rtype: dict
         """
         if type(samples) is dict:
@@ -198,8 +188,7 @@ class SchurTransform:
         get_cached: bool=True,
     ):
         """
-
-        ...
+        (This function is wrapped by ``functools.lru_cache``).
         
         :param dimension: The dimension of the base vector space.
         :type dimension: int
@@ -264,18 +253,17 @@ class SchurTransform:
         character_table: CharacterTable=None,
     ):
         """
-        :param projectors:
-            The projectors onto isotypic components, as returned by
+        :param projectors: The projectors onto isotypic components, as returned by
             :py:meth:`recalculate_projectors`.
         :type projectors: list
 
-        :param character_table:
-            The wrapper object around the character table for the symmetric group
-            pertaining to the tensor product space which is the projectors' domain.
+        :param character_table: The wrapper object around the character table for the
+            symmetric group pertaining to the tensor product space which is the
+            projectors' domain.
         :type character_table: CharacterTable
 
-        :return:
-            True if projectors sum to identity (within an error tolerance), else False.
+        :return: True if projectors sum to identity (within an error tolerance), else
+            False.
         :rtype: bool
         """
         identity = character_table.get_identity_partition_string()
@@ -305,20 +293,18 @@ class SchurTransform:
         samples,
     ):
         """
-        :param samples:
-            "Registered" spatial samples data.
-            
-            A multi-dimensional array, or nested list of lists of lists. The axis
-            indices are respectively:
+        :param samples: "Registered" spatial samples data. A multi-dimensional array, or
+            nested list of lists of lists. The axis indices are respectively:
 
             - the index indicating the series/variable
             - the sample index
             - the spatial coordinate index
+
         :type samples: multi-dimensional array-like
         
-        :return:
-            Same as ``samples``, except that a translation is applied to each spatial
-            variable which results in the new variable having mean vector equal to 0.
+        :return: Same as ``samples``, except that a translation is applied to each
+            spatial variable which results in the new variable having mean vector equal
+            to 0.
         :rtype: numpy.array
         """
         degree = samples.shape[0]
@@ -335,13 +321,16 @@ class SchurTransform:
 
     def calculate_covariance_tensor(self, samples):
         """
-        :param samples:
-            "Registered" spatial samples data, typically (but not necessarily) with mean
-            0 for each spatial variable.
-        :type samples: np.array
+        :param samples: "Registered" spatial samples data. A multi-dimensional array, or
+            nested list of lists of lists. The axis indices are respectively:
 
-        :return:
-            The joint moment of the spatial variables.
+            - the index indicating the series/variable
+            - the sample index
+            - the spatial coordinate index
+
+        :type samples: multi-dimensional array-like
+
+        :return: The joint moment of the spatial variables.
         :rtype: Tensor
         """
         degree = samples.shape[0]
@@ -368,18 +357,16 @@ class SchurTransform:
         projectors,
     ):
         """
-        :param tensor:
-            Input tensor to be decomposed.
+        :param tensor: Input tensor to be decomposed.
         :type tensor: Tensor
 
-        :param projectors:
-            Projector operators onto isotypic components, as returned by
+        :param projectors: Projector operators onto isotypic components, as returned by
             :py:meth:`recalculate_projectors`.
         :type projectors: dict
 
-        :return:
-            Keys are the integer partition strings labelling isotypic components, values
-            are the components of the input tensor, as :py:class:`.tensor.Tensor` objects.
+        :return: Keys are the integer partition strings labelling isotypic components,
+            values are the components of the input tensor, as :py:class:`.tensor.Tensor`
+            objects.
         :rtype: dict
         """
         degree = len(tensor.data.shape)
@@ -391,17 +378,14 @@ class SchurTransform:
 
     def validate_decomposition(self, decomposition, tensor):
         """
-        :param decomposition:
-            Additive Schur-Weyl decomposition, as returned e.g. by
+        :param decomposition: Additive Schur-Weyl decomposition, as returned e.g. by
             :py:meth:`calculate_decomposition`.
         :type decomposition: dict
 
-        :param tensor:
-                A given tensor.
+        :param tensor: A given tensor.
         :type tensor: Tensor
 
-        :return:
-            True if the sum of the components of the decomposition equals to the
+        :return: True if the sum of the components of the decomposition equals to the
             supplied tensor (within an error tolerance).
         :rtype: bool
         """
@@ -458,9 +442,12 @@ class SchurTransform:
         with importlib.resources.path(package=projectors_package, resource=filename) as path:
             projectors_npy = np.load(path)
 
-        projectors = {key : TensorOperator(number_of_factors = degree, dimension = dimension) for key in projectors_npy}
-        for key in projectors_npy:
-            projectors[key].data = projectors_npy[key]
+        projectors = {key : TensorOperator(
+            number_of_factors = degree,
+            dimension = dimension,
+            data = projectors_npy[key],
+        ) for key in projectors_npy}
+
         return projectors
 
 

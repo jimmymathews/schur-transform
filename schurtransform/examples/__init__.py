@@ -6,13 +6,11 @@ from .. import lung_data
 
 def get_example_data(dataset: str=None):
     """
-    :param dataset:
-        Use 'lung 4DCT' for a `dataset <https://www.dir-lab.com>`_ of registered
-        point locations annotated on CT scans of a lung breathing motion. 
+    :param dataset: Use 'lung 4DCT' for a `dataset <https://www.dir-lab.com>`_ of
+        registered point locations annotated on CT scans of a lung breathing motion.
     :type dataset: str
 
-    :return:
-        Each element is a list of lists of lists. The shape of each such 3-fold
+    :return: Each element is a list of lists of lists. The shape of each such 3-fold
         array is (6, 75, 3), indicating that the array consists 75 3-dimensional
         points registered across 6 time steps.
     :rtype: list
