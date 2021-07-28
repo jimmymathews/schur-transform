@@ -55,7 +55,7 @@ This outputs::
 
 The components are the GL(k)- or Sn-isotypic components of the covariance tensor of ``data`` in the tensor space with ``n`` tensor factors and ``k`` dimensions for each factor. Each one is presented as a multi-dimensional numpy array with ``n`` indices ranging across ``k`` values.
 
-The library ships with the character tables up to S6. For more than 6-fold statistics, see ``generate_characters/`` for information about using `GAP <https://www.gap-system.org/>`_ to generate additional character tables.
+The library ships with the character tables up to S6. For more than 6-fold statistics, see :doc:`Regenerating character tables <generatecharacters>` for information about using `GAP <https://www.gap-system.org/>`_ to generate additional character tables.
 
 Plotting example
 ----------------
