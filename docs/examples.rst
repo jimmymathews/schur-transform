@@ -1,5 +1,5 @@
-schurtransform.examples package
-===============================
+examples
+========
 
 .. automodule:: schurtransform.examples
     :members:

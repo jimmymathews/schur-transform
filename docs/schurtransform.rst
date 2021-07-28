@@ -11,18 +11,16 @@ Subpackages
 
 .. toctree::
 
-    schurtransform.character_tables
-    schurtransform.examples
-    schurtransform.lung_data
+    character_tables
+    examples
 
 Submodules
 ----------
 
 .. toctree::
 
-   schurtransform.character_table
-   schurtransform.log_formats
-   schurtransform.schur_transform
-   schurtransform.tensor
-   schurtransform.tensor_operator
+   character_table
+   schur_transform
+   tensor
+   tensor_operator
 

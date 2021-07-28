@@ -1,5 +1,5 @@
-schurtransform.tensor\_operator module
-======================================
+tensor\_operator
+================
 
 .. automodule:: schurtransform.tensor_operator
     :members:

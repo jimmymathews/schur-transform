@@ -70,7 +70,7 @@ setuptools.setup(
     python_requires='>=3.8',
     install_requires=requirements,
     project_urls = {
-        'Documentation': 'https://schurtransform.readthedocs.io/en/latest/',
+        'Documentation': 'https://schurtransform.readthedocs.io/',
         'Source code': 'https://github.com/schur-transform/schurtransform'
     }
 )

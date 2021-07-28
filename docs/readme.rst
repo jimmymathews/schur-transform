@@ -1,4 +1,3 @@
-
 Overview
 --------
 Fourier-Schur analysis is an analogue of Fourier analysis in which the time domain and corresponding cyclic symmetry are replaced by the spatial joint moment tensor domain and permutation symmetry (or, equivalently, linear spatial symmetry). It is used to derive natural higher-order statistics for "registered" spatial datasets.

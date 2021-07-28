@@ -1,5 +1,5 @@
-schurtransform.tensor module
-============================
+tensor
+======
 
 .. automodule:: schurtransform.tensor
     :members:

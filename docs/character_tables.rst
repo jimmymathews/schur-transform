@@ -1,5 +1,5 @@
-schurtransform.character\_tables package
-========================================
+character\_tables
+=================
 
 .. automodule:: schurtransform.character_tables
     :members:

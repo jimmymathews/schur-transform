@@ -1,5 +1,5 @@
-schurtransform.schur\_transform module
-======================================
+schur\_transform
+================
 
 .. automodule:: schurtransform.schur_transform
     :members:
