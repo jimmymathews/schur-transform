@@ -16,7 +16,7 @@ requirements = [
     'seaborn==0.11.1',
 ]
 
-version = '0.1.52'
+version = '0.1.53'
 
 setuptools.setup(
     name='schurtransform',
@@ -44,8 +44,6 @@ setuptools.setup(
             's4.csv',
             's5.csv',
             's6.csv',
-            's7.csv',
-            's8.csv',
             'symmetric_group_conjugacy_classes.csv',
         ],
         'schurtransform.projectors' : [

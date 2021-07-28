@@ -10,4 +10,3 @@ def transform(samples, **kwargs):
     See :py:meth:`.schur_transform.SchurTransform.transform`.
     """
     return global_transformer.transform(samples, **kwargs)
-

@@ -55,7 +55,8 @@ class Tensor:
         :param other_tensor: The other :py:class:`Tensor` object to add.
         :type other_tensor: Tensor
 
-        :param inplace: If True, adds in place (so that a new :py:class:`Tensor` is not returned).
+        :param inplace: If True, adds in place (so that a new :py:class:`Tensor` is not
+            returned).
         :type inplace: bool
 
         :return: The sum (unless ``inplace=True``, then returns None).
@@ -63,13 +64,13 @@ class Tensor:
         """
         if inplace:
             self.data = self.data + other_tensor.data
-        else:
-            tensor = Tensor(
-                number_of_factors=self.number_of_factors,
-                dimension=self.dimension,
-            )
-            tensor.data = self.data + other_tensor.data
-            return tensor
+            return None
+        tensor = Tensor(
+            number_of_factors=self.number_of_factors,
+            dimension=self.dimension,
+        )
+        tensor.data = self.data + other_tensor.data
+        return tensor
 
     def scale_by(self,
         amount: float=None,
@@ -90,10 +91,10 @@ class Tensor:
         """
         if inplace:
             self.data = self.data * amount
-        else:
-            tensor = Tensor(
-                number_of_factors=self.number_of_factors,
-                dimension=self.dimension,
-            )
-            tensor.data = self.data * amount
-            return tensor
+            return None
+        tensor = Tensor(
+            number_of_factors=self.number_of_factors,
+            dimension=self.dimension,
+        )
+        tensor.data = self.data * amount
+        return tensor

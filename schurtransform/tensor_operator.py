@@ -42,7 +42,9 @@ class TensorOperator:
         self.dimension = dimension
         if not data is None:
             if identity or (not permutation_inverse is None):
-                logger.error('If specifying exact data array, do not provide identity flag or permutation!')
+                logger.error(
+                    'If specifying exact data array, do not provide identity flag or permutation!'
+                )
             else:
                 self.data = data
             return
@@ -57,21 +59,21 @@ class TensorOperator:
 
         n = self.number_of_factors
         if identity:
-            it = np.nditer(self.data, flags = ['multi_index'])
-            for entry in it:
-                index = it.multi_index
+            iterator = np.nditer(self.data, flags = ['multi_index'])
+            for entry in iterator:
+                index = iterator.multi_index
                 in_index = [index[i] for i in range(n)]
                 out_index = [index[i+n] for i in range(n)]
-                if(in_index == out_index):
+                if in_index == out_index :
                     self.data[index] = 1.0
         if not permutation_inverse is None:
-            it = np.nditer(self.data, flags = ['multi_index'])
-            for entry in it:
-                index = it.multi_index
+            iterator = np.nditer(self.data, flags = ['multi_index'])
+            for entry in iterator:
+                index = iterator.multi_index
                 in_index = [index[i] for i in range(n)]
                 out_index = [index[i+n] for i in range(n)]
                 permuted_in_index = [index[permutation_inverse[i]-1] for i in range(n)]
-                if(permuted_in_index == out_index):
+                if permuted_in_index == out_index :
                     self.data[index] = 1.0
 
     def apply(self,
@@ -89,16 +91,23 @@ class TensorOperator:
             input_tensor.dimension != self.dimension
         ):
             logger.error(
-                "input_tensor type (number_of_factors, dimension)=(%s,%s) is not compatible with this operator, expected (%s, %s).",
+                ''.join([
+                    'input_tensor type (number_of_factors, dimension)=(%s,%s) ',
+                    'is not compatible with this operator, expected (%s, %s).',
+                ]),
                 str(input_tensor.number_of_factors),
                 str(input_tensor.dimension),
                 str(self.number_of_factors),
                 str(self.dimension),
             )
-            return
+            return None
         join_range_left = [i + self.number_of_factors for i in range(self.number_of_factors)]
         join_range_right = [i for i in range(self.number_of_factors)]
-        output_data = np.tensordot(self.data, input_tensor.data, axes=(join_range_left, join_range_right))
+        output_data = np.tensordot(
+            self.data,
+            input_tensor.data,
+            axes=(join_range_left, join_range_right),
+        )
         output_tensor = Tensor(
             number_of_factors=self.number_of_factors,
             dimension=self.dimension,
@@ -123,13 +132,14 @@ class TensorOperator:
         """
         if inplace:
             self.data = self.data + other_operator.data
-        else:
-            tensor_operator = TensorOperator(
-                number_of_factors=self.number_of_factors,
-                dimension=self.dimension,
-            )
-            tensor_operator.data = self.data + other_operator.data
-            return tensor_operator
+            return None
+
+        tensor_operator = TensorOperator(
+            number_of_factors=self.number_of_factors,
+            dimension=self.dimension,
+        )
+        tensor_operator.data = self.data + other_operator.data
+        return tensor_operator
 
     def scale_by(self,
         amount: float=None,
@@ -151,7 +161,8 @@ class TensorOperator:
         """
         if inplace:
             self.data = self.data * amount
-        else:
-            tensor_operator = TensorOperator(self.number_of_factors, self.dimension)
-            tensor_operator.data = self.data * amount
-            return tensor_operator
+            return None
+
+        tensor_operator = TensorOperator(self.number_of_factors, self.dimension)
+        tensor_operator.data = self.data * amount
+        return tensor_operator

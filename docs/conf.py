@@ -15,7 +15,7 @@ copyright = '2021, James Mathews'
 author = 'James Mathews'
 
 version = '0.1'
-release = '0.1.52'
+release = '0.1.53'
 
 # -- General configuration ---------------------------------------------------
 needs_sphinx = '1.8.5'
@@ -40,6 +40,9 @@ language = None
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 pygments_style = None
 html_theme = 'sphinx_rtd_theme'
+html_theme_options = {
+    'style_nav_header_background': '#078e8a',
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
