@@ -8,7 +8,7 @@ The algorithm used here is described in `A Schur Transform for Spatial Stochasti
 
 Getting started
 ---------------
-Install::
+Install from `PyPI <https://pypi.org/project/schurtransform/>`_::
 
     pip install schurtransform
 
