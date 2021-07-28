@@ -16,7 +16,7 @@ requirements = [
     'seaborn==0.11.1',
 ]
 
-version = '0.1.54'
+version = '0.1.55'
 
 setuptools.setup(
     name='schurtransform',
