@@ -3,7 +3,7 @@ import os
 
 dir = os.path.dirname(os.path.realpath(__file__))
 
-long_description = """[Documentation](https://schurtransform.readthedocs.io/en/latest/).
+long_description = """[Documentation](https://schurtransform.readthedocs.io/en/stable/readme.html).
 """
 
 with open(os.path.join(dir, 'schurtransform', 'lung_data', 'examples_manifest.csv')) as fh:
