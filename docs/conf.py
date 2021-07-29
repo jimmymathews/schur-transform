@@ -14,8 +14,8 @@ project = 'schurtransform'
 copyright = '2021, James Mathews'
 author = 'James Mathews'
 
-version = '0.1'
-release = '0.1.58'
+version = '0.2'
+release = '0.2.0'
 
 # -- General configuration ---------------------------------------------------
 needs_sphinx = '1.8.5'

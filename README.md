@@ -1,5 +1,5 @@
 
-[Documentation](https://schurtransform.readthedocs.io)
+[Documentation](https://schurtransform.readthedocs.io/en/stable/readme.html)
 
 For development, check that tests pass:
 

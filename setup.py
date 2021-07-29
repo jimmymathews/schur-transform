@@ -16,7 +16,7 @@ requirements = [
     'seaborn==0.11.1',
 ]
 
-version = '0.1.58'
+version = '0.2.0'
 
 setuptools.setup(
     name='schurtransform',
@@ -70,7 +70,7 @@ setuptools.setup(
     python_requires='>=3.8',
     install_requires=requirements,
     project_urls = {
-        'Documentation': 'https://schurtransform.readthedocs.io/',
-        'Source code': 'https://schurtransform.readthedocs.io/en/stable/readme.html'
+        'Documentation': 'https://schurtransform.readthedocs.io/en/stable/readme.html',
+        'Source code': 'https://github.com/schur-transform/schurtransform'
     }
 )
