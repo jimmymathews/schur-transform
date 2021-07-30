@@ -58,8 +58,8 @@ if [[ ( "$FOUND_VERSION_CHANGE" == "1" ) && ( "$FOUND_ANOTHER_CHANGE" == "0" ) ]
         git push origin v$version && \
         echo "Pushed v$version to remote." && \
         echo "Migrating updates to stable branch." && \
-        git checkout stable && \
         rm schurtransform/version.txt && \
+        git checkout stable && \
         git merge main && \
         git push 1>/dev/null && \
         git checkout main
