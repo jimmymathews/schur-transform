@@ -1,5 +1,11 @@
 #!/bin/bash
 
+current_branch=$(git branch | grep '^* ')
+if [[ "$current_branch" != "* main" ]]; then
+    echo "Do autoreleasing from branch main."
+    exit
+fi
+
 FOUND_VERSION_CHANGE=0
 FOUND_ANOTHER_CHANGE=0
 git status -s |
@@ -33,6 +39,19 @@ fi
 
 if [[ ( "$FOUND_VERSION_CHANGE" == "1" ) && ( "$FOUND_ANOTHER_CHANGE" == "0" ) ]]; then
     echo "Ready to autorelease; version is updated, and everything else is the same."
-    echo "<autoreleasing...>"
+    echo "Building package."
+    if test -d 'dist'; then
+        rm dist/*
+    fi
+    python3 -m build 1>/dev/null
+    echo "Built:"
+    for f in dist/*;
+    do
+        echo "    $f"
+    done
+    version=$(cat schurtransform/version.txt)
+    echo "Committing this version, v$version ."
+    git add schurtransform/version.txt && git commit -m 'Autoreleasing v$version' && git push
+
 fi
 }
