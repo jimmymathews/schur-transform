@@ -1,16 +1,7 @@
 #!/bin/bash
-versionline=$(cat setup.py | grep -oP "^version = '[0-9]+\.[0-9]+\.[0-9]+'$")
-macroversion=$(echo $versionline | grep -oP "^version = '[0-9]+\.[0-9]+\.")
-microversion=$(echo $versionline | grep -oP "[0-9]+'")
-microversion=$(echo $microversion | grep -oP "[0-9]+")
+location="schurtransform/version.txt"
+version=$(cat "$location")
+prefix=$(echo "$version" | grep -oP '^([\d]+\.[\d]+\.)')
+microversion=$(echo "$version" | grep -oP '([\d]+)$')
 microversion=$(( microversion + 1 ))
-newversionline="$macroversion$microversion'"
-sed -i "s/$versionline/$newversionline/g" setup.py
-
-releaseline=$(cat docs/conf.py | grep -oP "^release = '[0-9]+\.[0-9]+\.[0-9]+'$")
-macroversion=$(echo $releaseline | grep -oP "^release = '[0-9]+\.[0-9]+\.")
-microversion=$(echo $releaseline | grep -oP "[0-9]+'")
-microversion=$(echo $microversion | grep -oP "[0-9]+")
-microversion=$(( microversion + 1 ))
-newreleaseline="$macroversion$microversion'"
-sed -i "s/$releaseline/$newreleaseline/g" docs/conf.py
+echo "$prefix$microversion" > $location

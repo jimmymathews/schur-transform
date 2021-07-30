@@ -15,7 +15,7 @@ copyright = '2021, James Mathews'
 author = 'James Mathews'
 
 version = '0.2'
-release = '0.2.0'
+release = '0.2.1'
 
 # -- General configuration ---------------------------------------------------
 needs_sphinx = '1.8.5'

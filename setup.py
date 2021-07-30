@@ -1,13 +1,19 @@
 import setuptools
 import os
+from os.path import join, dirname
+import re
 
-dir = os.path.dirname(os.path.realpath(__file__))
+def get_file_contents(filename):
+    package_directory = os.path.dirname(__file__)
+    with open(join(package_directory, filename), 'r', encoding='utf-8') as file:
+        contents = file.read()
+    return contents
 
 long_description = """[Documentation](https://schurtransform.readthedocs.io/en/stable/readme.html).
 """
 
-with open(os.path.join(dir, 'schurtransform', 'lung_data', 'examples_manifest.csv')) as fh:
-    example_files = [row.split(',')[0] for row in fh.read().split('\n')]
+example_files = get_file_contents(join(['schurtransform', 'lung_data', 'examples_manifest.csv']))
+example_files = [row.split(',')[0] for row in example_files.split('\n')]
 
 requirements = [
     'numpy==1.21.0',
@@ -16,7 +22,7 @@ requirements = [
     'seaborn==0.11.1',
 ]
 
-version = '0.2.0'
+version = get_file_contents(join('schurtransform', 'version.txt'))
 
 setuptools.setup(
     name='schurtransform',
@@ -38,7 +44,7 @@ setuptools.setup(
         'schurtransform.examples',
     ],
     package_data={
-        'schurtransform': ['VERSION'],
+        'schurtransform': ['version.txt'],
         'schurtransform.character_tables' : [
             's2.csv',
             's3.csv',
