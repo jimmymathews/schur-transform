@@ -4,4 +4,4 @@ version=$(cat "$location")
 prefix=$(echo "$version" | grep -oP '^([\d]+\.[\d]+\.)')
 microversion=$(echo "$version" | grep -oP '([\d]+)$')
 microversion=$(( microversion + 1 ))
-echo "$prefix$microversion" > $location
+echo -n "$prefix$microversion" > $location
