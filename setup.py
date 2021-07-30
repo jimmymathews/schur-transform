@@ -78,5 +78,6 @@ setuptools.setup(
     project_urls = {
         'Documentation': 'https://schurtransform.readthedocs.io/en/stable/readme.html',
         'Source code': 'https://github.com/schur-transform/schurtransform'
-    }
+    },
+    url = 'https://github.com/schur-transform/schurtransform',
 )
