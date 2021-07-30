@@ -4,6 +4,7 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
+import pkg_resources
 import os
 import sys
 sys.path.insert(0, os.path.abspath('.'))
@@ -14,8 +15,9 @@ project = 'schurtransform'
 copyright = '2021, James Mathews'
 author = 'James Mathews'
 
-version = '0.2'
-release = '0.2.1'
+full_version = pkg_resources.require(project)[0].version
+version = re.search(r'^\d+\.\d+', full_version).group(0)
+release = full_version
 
 # -- General configuration ---------------------------------------------------
 needs_sphinx = '1.8.5'
