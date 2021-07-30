@@ -4,8 +4,9 @@
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-import pkg_resources
 import os
+from os.path import join, dirname
+import re
 import sys
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../'))
@@ -15,7 +16,13 @@ project = 'schurtransform'
 copyright = '2021, James Mathews'
 author = 'James Mathews'
 
-full_version = pkg_resources.require(project)[0].version
+def get_file_contents(filename):
+    package_directory = dirname(__file__)
+    with open(join(package_directory, filename), 'r', encoding='utf-8') as file:
+        contents = file.read()
+    return contents
+
+full_version = get_file_contents(join('..', project, 'version.txt'))
 version = re.search(r'^\d+\.\d+', full_version).group(0)
 release = full_version
 
