@@ -12,7 +12,7 @@ def get_file_contents(filename):
 long_description = """[Documentation](https://schurtransform.readthedocs.io/en/stable/readme.html).
 """
 
-example_files = get_file_contents(join(['schurtransform', 'lung_data', 'examples_manifest.csv']))
+example_files = get_file_contents(join('schurtransform', 'lung_data', 'examples_manifest.csv'))
 example_files = [row.split(',')[0] for row in example_files.split('\n')]
 
 requirements = [
