@@ -62,6 +62,7 @@ if [[ ( "$FOUND_VERSION_CHANGE" == "1" ) && ( "$FOUND_ANOTHER_CHANGE" == "0" ) ]
         git checkout stable && \
         git merge main && \
         git push 1>/dev/null && \
-        git checkout main
+        git checkout main && \
+        python3 -m twine upload --repository schurtransform dist/*
 fi
 }
