@@ -39,7 +39,7 @@ fi
 
 if [[ ( "$FOUND_VERSION_CHANGE" == "1" ) && ( "$FOUND_ANOTHER_CHANGE" == "0" ) ]]; then
     echo "Ready to autorelease; version is updated, and everything else is the same."
-    echo "Building package."
+    echo -n "Building package"
     if test -d 'dist'; then
         rm dist/*
     fi
@@ -50,8 +50,12 @@ if [[ ( "$FOUND_VERSION_CHANGE" == "1" ) && ( "$FOUND_ANOTHER_CHANGE" == "0" ) ]
         echo "    $f"
     done
     version=$(cat schurtransform/version.txt)
-    echo "Committing this version, v$version ."
-    git add schurtransform/version.txt && git commit -m 'Autoreleasing v$version' && git push
-
+    echo "Committing this version: v$version"
+    git add schurtransform/version.txt && \
+        git commit -m 'Autoreleasing v$version' && \
+        git tag -a v$version && \
+        git push 1>/dev/null && \
+        git push origin v$version
+    echo "Pushed v$version to remote."
 fi
 }
