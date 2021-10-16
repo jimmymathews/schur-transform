@@ -1,7 +1,7 @@
 #!/bin/bash
 location="schurtransform/version.txt"
 version=$(cat "$location")
-prefix=$(echo "$version" | grep -oP '^([\d]+\.[\d]+\.)')
-microversion=$(echo "$version" | grep -oP '([\d]+)$')
+prefix=$(echo "$version" | grep -o '^([\d]+\.[\d]+\.)')
+microversion=$(echo "$version" | grep -o '([\d]+)$')
 microversion=$(( microversion + 1 ))
 echo -n "$prefix$microversion" > $location
