@@ -77,10 +77,10 @@ A more extensive usage example::
 This calculates the *Schur content* (many Schur transforms for various subsets of the series index) of a lung deformation as measured by a 4D CT scan. Data available for download from `DIR-lab <https://dir-lab.com>`_.
 
 .. image:: _static/schur_content_5_factor.png
-    :target: _static/schur_content_5_factor.png
+   :target: _static/schur_content_5_factor.png
 
 .. image:: _static/schur_content_6_factor.png
-    :target: _static/schur_content_6_factor.png
+   :target: _static/schur_content_6_factor.png
 
 .. image:: _static/anim_150_150.gif
-    :align: center
+   :align: center
