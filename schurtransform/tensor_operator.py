@@ -1,3 +1,6 @@
+import itertools
+from itertools import product
+
 import numpy as np
 
 from .tensor import Tensor
@@ -166,3 +169,51 @@ class TensorOperator:
         tensor_operator = TensorOperator(self.number_of_factors, self.dimension)
         tensor_operator.data = self.data * amount
         return tensor_operator
+
+    def __repr__(self):
+        return OperatorPrinter.repr_of_tensor_operator(self.data)
+
+
+class OperatorPrinter:
+    @staticmethod
+    def value_on_basis_element(operator, element):
+        number_factors = int(len(operator.shape) / 2)
+        dimension = operator.shape[0]
+        tensor_element = np.zeros([dimension] * number_factors)
+        tensor_element[tuple(element)] = 1
+        join_range_left = [i + number_factors for i in range(number_factors)]
+        join_range_right = [i for i in range(number_factors)]
+        output_data = np.tensordot(
+            operator,
+            tensor_element,
+            axes=(join_range_left, join_range_right),
+        )
+        indices = list(product(list(range(dimension)), repeat=3))
+        return [
+            (output_data[tuple(index)], index)
+            for index in indices
+            if output_data[index] != 0
+        ]
+
+    @staticmethod
+    def polynomial(index, dual=False):
+        base = ''.join(['e' + str(i) for i in index])
+        if dual:
+            base = '(' + base + ')*'
+        return base
+
+    @staticmethod
+    def repr_of_tensor_operator(operator):
+        number_factors = int(len(operator.shape) / 2)
+        dimension = operator.shape[0]
+        indices = list(product(list(range(dimension)), repeat=3))
+        values = [(index, OperatorPrinter.value_on_basis_element(operator, index)) for index in indices]
+        return '\n + '.join([
+            '( ' +
+            ' + '.join([
+                str(coefficient) + ' ' + OperatorPrinter.polynomial(inner_index)
+                for coefficient, inner_index in sparse_value
+            ]) + ' ) ' + OperatorPrinter.polynomial(index, dual=True)
+            for index, sparse_value in values
+            if len(sparse_value) > 0
+        ])

@@ -6,6 +6,8 @@ if [[ "$current_branch" != "* main" ]]; then
     exit
 fi
 
+release_to_branch="stable"
+
 FOUND_VERSION_CHANGE=0
 FOUND_ANOTHER_CHANGE=0
 git status -s |
@@ -57,9 +59,9 @@ if [[ ( "$FOUND_VERSION_CHANGE" == "1" ) && ( "$FOUND_ANOTHER_CHANGE" == "0" ) ]
         git push 1>/dev/null && \
         git push origin v$version && \
         echo "Pushed v$version to remote." && \
-        echo "Migrating updates to stable branch." && \
+        echo "Migrating updates to $release_to_branch branch." && \
         rm schurtransform/version.txt && \
-        git checkout stable && \
+        git checkout $release_to_branch && \
         git merge main && \
         git push 1>/dev/null && \
         git checkout main && \
