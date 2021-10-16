@@ -197,7 +197,7 @@ class OperatorPrinter:
 
     @staticmethod
     def polynomial(index, dual=False):
-        base = ''.join(['e' + str(i) for i in index])
+        base = '\u2297'.join(['e' + str(i) for i in index])
         if dual:
             base = '(' + base + ')*'
         return base
