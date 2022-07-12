@@ -16,7 +16,7 @@ example_files = get_file_contents(join('schurtransform', 'lung_data', 'examples_
 example_files = [row.split(',')[0] for row in example_files.split('\n')]
 
 requirements = [
-    'numpy==1.21.0',
+    'numpy==1.22.3',
     'pandas==1.1.5',
     'matplotlib==3.4.2',
     'seaborn==0.11.1',
