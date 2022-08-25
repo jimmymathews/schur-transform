@@ -73,7 +73,7 @@ setuptools.setup(
         'Topic :: Scientific/Engineering',
         'Intended Audience :: Science/Research',
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     install_requires=requirements,
     project_urls = {
         'Documentation': 'https://schurtransform.readthedocs.io/en/stable/readme.html',
