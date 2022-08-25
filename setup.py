@@ -16,7 +16,7 @@ example_files = get_file_contents(join('schurtransform', 'lung_data', 'examples_
 example_files = [row.split(',')[0] for row in example_files.split('\n')]
 
 requirements = [
-    'numpy==1.22.3',
+    'numpy==1.21.6',
     'pandas==1.1.5',
     'matplotlib==3.4.2',
     'seaborn==0.11.1',
@@ -73,7 +73,7 @@ setuptools.setup(
         'Topic :: Scientific/Engineering',
         'Intended Audience :: Science/Research',
     ],
-    python_requires='>=3.8',
+    python_requires='>=3.7',
     install_requires=requirements,
     project_urls = {
         'Documentation': 'https://schurtransform.readthedocs.io/en/stable/readme.html',
